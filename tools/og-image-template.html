@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>og-image template — screenshot this at 1200 × 630</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400&family=Fraunces:opsz,wght,WONK@9..144,300..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: #555; display: grid; place-items: center; min-height: 100vh; padding: 24px; }
+
+      /* Exactly the Open Graph size. Screenshot this box and nothing else. */
+      .card {
+        width: 1200px;
+        height: 630px;
+        background: #16302b;
+        color: #e8ede2;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 64px 72px;
+        font-family: 'Courier Prime', monospace;
+      }
+
+      .strip {
+        display: flex;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(232, 237, 226, 0.3);
+        padding-bottom: 20px;
+        font-size: 20px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: rgba(232, 237, 226, 0.75);
+      }
+
+      .names {
+        font-family: 'Fraunces', Georgia, serif;
+        font-variation-settings: 'opsz' 144, 'WONK' 1;
+        font-weight: 500;
+        font-size: 92px;
+        line-height: 1.08;
+        text-align: center;
+      }
+
+      .amp { color: #d9a441; font-size: 56px; display: block; margin: 12px 0; }
+
+      .foot {
+        text-align: center;
+        font-size: 22px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: rgba(232, 237, 226, 0.75);
+      }
+
+      .stub { height: 8px; background: #d9a441; width: 120px; margin: 28px auto 0; }
+    </style>
+  </head>
+  <body>
+    <!--
+      How to turn this into public/og-image.jpg:
+      1. Open this file in Chrome.
+      2. Right-click the dark card -> Inspect, then in the Elements panel
+         right-click the <div class="card"> node -> "Capture node screenshot".
+      3. Rename the download to og-image.jpg (convert PNG -> JPG if you like;
+         WhatsApp accepts both, just keep the filename og-image.jpg) and put it
+         in the public/ folder.
+
+      Or skip all this and crop one of your own photos to 1200 x 630 instead.
+      A real photo of the two of you will always beat this.
+    -->
+    <div class="card">
+      <div class="strip">
+        <span>Kluang · Johor</span>
+        <span>13.03.2027</span>
+      </div>
+
+      <div class="names">
+        Lim Jet Sheng
+        <span class="amp">&amp;</span>
+        Liew Mei Yean
+      </div>
+
+      <div>
+        <div class="foot">Saturday · 13 March 2027 · 7:00 pm</div>
+        <div class="stub"></div>
+      </div>
+    </div>
+  </body>
+</html>

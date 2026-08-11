@@ -1,0 +1,202 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------------------
+   The Kluang Line — design tokens.
+   Colours are pulled from an old Malayan Railway card ticket: pale eau-de-nil
+   stock, deep plantation pine, kopi brown, an ochre stub edge. --seal is the
+   signal red and it appears on the confirmation stamp and nowhere else.
+--------------------------------------------------------------------------- */
+@theme {
+  --color-paper: #e8ede2;
+  --color-card: #f1f4ec;
+  --color-ink: #16302b;
+  --color-kopi: #6b4a2f;
+  --color-rail: #9aa894;
+  --color-ochre: #d9a441;
+  --color-seal: #a63d40;
+
+  --font-display: 'Fraunces', 'Noto Serif SC', Georgia, serif;
+  --font-body: 'Karla', ui-sans-serif, system-ui, sans-serif;
+  --font-ticket: 'Courier Prime', ui-monospace, 'Courier New', monospace;
+}
+
+/* --------------------------------------------------------------------------
+   Base
+-------------------------------------------------------------------------- */
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-kopi);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: var(--color-ochre);
+  color: var(--color-ink);
+}
+
+/* One visible focus style everywhere, on paper and on ink. */
+:focus-visible {
+  outline: 2px solid var(--color-ochre);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+/* --------------------------------------------------------------------------
+   Type roles
+-------------------------------------------------------------------------- */
+
+/* The names, at full optical size. Fraunces gets high-contrast strokes and the
+   WONK axis on, which is the whole reason to use this face. */
+.name-display {
+  font-family: var(--font-display);
+  font-variation-settings: 'opsz' 144, 'WONK' 1;
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+}
+
+/* Section headings sit lower on the optical-size axis so they read as text
+   rather than as a second set of names. */
+.heading-display {
+  font-family: var(--font-display);
+  font-variation-settings: 'opsz' 36, 'WONK' 0;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+/* Chinese characters never render in Fraunces. */
+.zh {
+  font-family: 'Noto Serif SC', var(--font-display), serif;
+  font-variation-settings: normal;
+  font-weight: 400;
+}
+
+/* Printed ticket data: dates, times, seat counts, the countdown. */
+.ticket-data {
+  font-family: var(--font-ticket);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------
+   The ticket stub — perforated top edge with notches punched at both sides.
+   The notches are circles filled with the page background, so they read as
+   holes rather than as dots.
+-------------------------------------------------------------------------- */
+.perforation {
+  border-top: 2px dashed var(--color-rail);
+}
+
+.notch {
+  position: absolute;
+  top: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  background-color: var(--color-paper);
+  transform: translateY(-50%);
+}
+
+.notch-left {
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+.notch-right {
+  right: 0;
+  transform: translate(50%, -50%);
+}
+
+/* --------------------------------------------------------------------------
+   The stamp. The one bold moment in the design.
+-------------------------------------------------------------------------- */
+@keyframes stamp-thunk {
+  0% {
+    opacity: 0;
+    transform: rotate(-26deg) scale(2.8);
+  }
+  55% {
+    opacity: 1;
+    transform: rotate(-7deg) scale(1.06);
+  }
+  72% {
+    transform: rotate(-7deg) scale(0.965);
+  }
+  86% {
+    transform: rotate(-7deg) scale(1.015);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(-7deg) scale(1);
+  }
+}
+
+@keyframes stamp-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.stamp {
+  animation: stamp-thunk 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* --------------------------------------------------------------------------
+   Scroll reveals — subtle, once only.
+-------------------------------------------------------------------------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 700ms ease-out,
+    transform 700ms ease-out;
+}
+
+.reveal-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* --------------------------------------------------------------------------
+   prefers-reduced-motion: no rotation, no travel, no smooth scroll.
+-------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal,
+  .reveal-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  /* Safety net for anything not handled explicitly above. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* The stamp is the exception: it still arrives, it just fades instead of
+     rotating. Higher specificity than the safety net, so this wins. */
+  .stamp {
+    animation: stamp-fade 400ms ease-out both !important;
+    transform: rotate(-7deg);
+  }
+}
