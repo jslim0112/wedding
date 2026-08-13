@@ -30,7 +30,7 @@ export default function Countdown() {
     <Section id="countdown" label="Departure in">
       <Reveal>
         {left.done ? (
-          <p className="heading-display text-center text-[1.6rem] text-ink sm:text-3xl">
+          <p className="heading-display text-center text-[2.4rem] text-ink sm:text-[3.2rem]">
             Today’s the day.
           </p>
         ) : (

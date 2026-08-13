@@ -20,7 +20,7 @@ export default function Section({ id, label, title, children, className = '' }) 
         <Reveal as="header" className="mb-8">
           {label && <p className="ticket-data text-[0.68rem] text-rail">{label}</p>}
           {title && (
-            <h2 className="heading-display mt-2 text-[1.75rem] text-ink sm:text-4xl">{title}</h2>
+            <h2 className="heading-display mt-2 text-[2.6rem] text-ink sm:text-[3.4rem]">{title}</h2>
           )}
         </Reveal>
       )}

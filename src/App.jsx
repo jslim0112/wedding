@@ -4,9 +4,17 @@ import Story from './components/Story'
 import Gallery from './components/Gallery'
 import Details from './components/Details'
 import Rsvp from './components/Rsvp'
+import { useRef } from 'react'
 import Footer from './components/Footer'
+import MusicPlayer from './components/MusicPlayer'
+import EntryGate from './components/EntryGate'
 
 export default function App() {
+  // The entry screen owns the tap; the player owns the audio element. This is
+  // the wire between them - and it must stay a direct, synchronous call, or
+  // the browser stops treating the music as something the guest asked for.
+  const music = useRef(null)
+
   return (
     <>
       <Hero />
@@ -28,6 +36,11 @@ export default function App() {
       </main>
 
       <Footer />
+
+      {/* Both are fixed to the viewport, so they sit outside the document flow
+          and render nothing until a song is set in config.js. */}
+      <MusicPlayer ref={music} />
+      <EntryGate onOpen={() => music.current?.start()} />
     </>
   )
 }

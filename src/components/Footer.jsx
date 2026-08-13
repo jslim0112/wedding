@@ -9,7 +9,7 @@ export default function Footer() {
       <div className="mx-auto w-full max-w-[680px] px-6 py-16 text-center sm:py-20">
         <p className="ticket-data text-[0.6rem] text-paper/55">End of line</p>
 
-        <h2 className="heading-display mt-4 text-[1.6rem] sm:text-3xl">Questions? Just ask.</h2>
+        <h2 className="heading-display mt-4 text-[2.4rem] sm:text-[3.2rem]">Questions? Just ask.</h2>
 
         <p className="mx-auto mt-4 max-w-md text-[1rem] leading-relaxed text-paper/80">
           {footer.thanks}

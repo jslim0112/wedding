@@ -17,14 +17,14 @@ export const config = {
   couple: {
     // Order here is the order they appear on the page.
     groom: {
-      first: 'Jet Sheng',
-      full: 'Lim Jet Sheng',
-      zh: '', // TODO: paste the Chinese characters, e.g. '林哲昇'
+      first: 'Jason',
+      full: 'Jason',
+      zh: '林杰圣', // TODO: paste the Chinese characters, e.g. '林哲昇'
     },
     bride: {
       first: 'Mei Yean',
-      full: 'Liew Mei Yean',
-      zh: '', // TODO: paste the Chinese characters, e.g. '廖美燕'
+      full: 'Mei Yean',
+      zh: '刘美宴', // TODO: paste the Chinese characters, e.g. '廖美燕'
     },
   },
 
@@ -67,8 +67,8 @@ export const config = {
 
   // First contact is the one shown in error messages.
   contacts: [
-    { name: 'Jason', phone: '60106611189', display: '010-661 1189' },
-    { name: 'Mei Yean', phone: '60169406935', display: '016-940 6935' },
+    { name: 'Jason', phone: '', display: '' },
+    { name: 'Mei Yean', phone: '', display: '' },
   ],
 
   hero: {
@@ -85,8 +85,8 @@ export const config = {
     ],
     photos: [
       // TODO: paste Supabase Storage public URLs.
-      { src: '', alt: 'Jet Sheng and Mei Yean', slot: 'Story photo 1 — portrait works best' },
-      { src: '', alt: 'Jet Sheng and Mei Yean', slot: 'Story photo 2 — portrait works best' },
+      { src: '', alt: 'Jason and Mei Yean', slot: 'Story photo 1 — portrait works best' },
+      { src: '', alt: 'Jason and Mei Yean', slot: 'Story photo 2 — portrait works best' },
     ],
   },
 
@@ -99,6 +99,42 @@ export const config = {
     { src: '', alt: '', slot: 'Gallery 5' },
     { src: '', alt: '', slot: 'Gallery 6' },
   ],
+
+  /* The floating music player, bottom-left of every screen.
+     Leave `src` and `path` both blank and the player does not render at all.
+
+     Two ways to point it at the song, in this order of preference:
+       path — the file name inside the Supabase Storage bucket named in
+              `bucket`, e.g. 'our-song.mp3'. The public URL is worked out for
+              you, so you never paste a long URL.
+       src  — a full URL, if the file lives somewhere else entirely.
+
+     MP3 is the safe format. m4a and ogg work on most phones; wav is enormous.
+     Keep it under about 6 MB or guests on mobile data will wait for it. */
+  music: {
+    bucket: 'wedding-photos',
+    path: 'its_you_opening_cut.mp3',
+    src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/its_you_opening_cut.mp3?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC9pdHNfeW91X29wZW5pbmdfY3V0Lm1wMyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODY2MzExODUsImV4cCI6MTgxODE2NzE4NX0.5X9xRyOIg2_ANZ3hM9W-olbKkkxgbWbs0MTtr98OX7o',
+    title: 'Our song',
+    artist: 'Henry',
+    // 0 to 1. Background music wants to sit under conversation, not over it.
+    volume: 0.55,
+    // Start the song as soon as the page opens. Browsers block unprompted
+    // sound on a first visit, so when that happens the player falls back to
+    // starting on the guest's first tap or key press anywhere on the page —
+    // which browsers do allow. Either way it plays without them pressing
+    // anything. Once a guest presses pause it stays paused.
+    // Set to false to have the page open silent until play is pressed.
+    autoplay: true,
+
+    // The "Open invitation" screen that greets a guest before the page.
+    // It exists because browsers will not play sound until a guest taps
+    // something - and scrolling deliberately does not count. This turns that
+    // required tap into the opening of the invitation, so the music starts
+    // for everyone instead of only for guests who happen to tap.
+    // Set to false to open straight onto the page.
+    entryScreen: true,
+  },
 
   footer: {
     thanks:

@@ -23,3 +23,15 @@ export const supabase = isSupabaseConfigured
       auth: { persistSession: false, autoRefreshToken: false },
     })
   : null
+
+/**
+ * The public URL of a file in a public Storage bucket, so config.js can name a
+ * file ('our-song.mp3') instead of carrying a hundred-character URL. Reading a
+ * public object needs no request and no key beyond the anon one already here.
+ * Returns '' when the bucket or file name is missing, or when Supabase is not
+ * configured yet - every caller treats '' as "nothing to show".
+ */
+export function publicUrl(bucket, path) {
+  if (!supabase || !bucket || !path) return ''
+  return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl || ''
+}
