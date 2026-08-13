@@ -145,7 +145,7 @@ export default function Rsvp() {
             <p className="ticket-data text-[0.6rem] text-rail">
               {couple.groom.first} &amp; {couple.bride.first} · {wedding.dateShort}
             </p>
-            <p className="heading-display mt-3 text-2xl text-ink">
+            <p className="heading-display mt-3 text-[2.2rem] text-ink">
               {attending ? 'Thank you — see you in Kluang.' : 'Thank you for letting us know.'}
             </p>
             <p className="mx-auto mt-3 max-w-sm text-[0.95rem] leading-relaxed text-kopi">

@@ -4,7 +4,7 @@ function Name({ person }) {
   return (
     <span className="block">
       {person.full}
-      {person.zh && <span className="zh mt-1 block text-[0.46em] tracking-[0.12em]">{person.zh}</span>}
+      {person.zh && <span className="zh mt-2 block text-[0.28em] tracking-[0.12em]">{person.zh}</span>}
     </span>
   )
 }
@@ -38,20 +38,27 @@ export default function Hero() {
       {/* Ticket header strip */}
       <div className="mx-auto w-full max-w-[680px] px-6 pt-6">
         <div className="flex items-baseline justify-between border-b border-paper/25 pb-3">
-          <span className="ticket-data text-[0.6rem] text-paper/70">{wedding.place}</span>
-          <span className="ticket-data text-[0.6rem] text-paper/70">{wedding.dateShort}</span>
+          <span className="ticket-data text-[0.8rem] text-paper/70">{wedding.place}</span>
+          <span className="ticket-data text-[0.8rem] text-paper/70">{wedding.dateShort}</span>
         </div>
       </div>
 
       {/* Names */}
       <div className="mx-auto w-full max-w-[680px] px-6 py-10 text-center">
-        <p className="ticket-data mb-8 text-[0.62rem] text-paper/60">You are invited</p>
+        <p className="ticket-data mb-8 text-[1.2rem] text-paper/60"><b>You are invited</b></p>
 
-        <h1 className="name-display text-[2.05rem] text-paper sm:text-[3.5rem]">
+        <h1 className="name-display text-[3.4rem] text-paper sm:text-[5.5rem]">
           <Name person={couple.groom} />
-          <span aria-hidden="true" className="my-3 block text-[0.62em] text-ochre">
-            &amp;
-          </span>
+          {/* Inline SVG rather than the ❤️ emoji: every OS draws its own emoji,
+              so this keeps one shape and one red across all of them. */}
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="mx-auto my-4 block size-6 text-seal sm:size-9"
+          >
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+          </svg>
           <span className="sr-only">and</span>
           <Name person={couple.bride} />
         </h1>
