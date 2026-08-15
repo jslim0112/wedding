@@ -61,16 +61,18 @@ export default function EntryGate({ onOpen }) {
       }`}
     >
       <div className="w-full max-w-[380px] bg-card px-7 pt-8 pb-7 text-center text-ink shadow-[0_12px_44px_rgba(0,0,0,0.45)]">
-        <p className="ticket-data text-[0.55rem] text-rail">Right Time, Right Moment</p>
+        <p className="ticket-data text-[0.8rem] text-rail">Right Time<b> · </b>Right Moment</p>
 
         <h1 id="entry-names" className="name-display mt-5 text-[2.6rem] leading-tight text-ink">
           {couple.groom.full}
-          <span className="ticket-data my-1 block text-[0.55rem] text-rail">and</span>
+          <span aria-hidden="true" className="text-seal text-[1.6rem] my-1 block text-[0.55rem]">
+            ♥
+          </span>
           {couple.bride.full}
         </h1>
 
-        <p className="ticket-data mt-5 text-[0.58rem] leading-relaxed text-rail">
-          {wedding.dayLabel} · {wedding.dateLong}
+        <p className="ticket-data mt-5 text-[0.8rem] leading-relaxed text-rail">
+          We wish to invite you
         </p>
 
         {/* The stub, torn along the same perforation as the RSVP ticket. */}
@@ -86,10 +88,6 @@ export default function EntryGate({ onOpen }) {
             </svg>
             Open invitation
           </button>
-
-          <p className="ticket-data mt-3 text-[0.5rem] leading-relaxed text-rail">
-            Music plays when you open
-          </p>
         </div>
       </div>
     </div>

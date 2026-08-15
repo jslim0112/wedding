@@ -10,18 +10,13 @@ const EMPTY_FORM = {
   fullName: '',
   phone: '',
   attending: null, // null until chosen, so "required" means something
-  pax: '2',
-  guestNames: '',
-  dietaryOther: '',
-  side: '',
-  message: '',
+  pax: '', // blank on purpose - a prefilled number gets submitted unread
   website: '', // honeypot
 }
 
 export default function Rsvp() {
   const { rsvp, contacts, couple, wedding } = config
   const [form, setForm] = useState(EMPTY_FORM)
-  const [dietaryPicks, setDietaryPicks] = useState([])
   const [errors, setErrors] = useState({})
   const [status, setStatus] = useState('idle') // idle | saving | done | error
   const [submitError, setSubmitError] = useState(null)
@@ -33,12 +28,6 @@ export default function Rsvp() {
     const value = event?.target?.type === 'checkbox' ? event.target.checked : event.target.value
     setForm((f) => ({ ...f, [key]: value }))
     setErrors((e) => (e[key] ? { ...e, [key]: undefined } : e))
-  }
-
-  const toggleDietary = (chip) => {
-    setDietaryPicks((picks) =>
-      picks.includes(chip) ? picks.filter((p) => p !== chip) : [...picks, chip],
-    )
   }
 
   useEffect(() => {
@@ -59,13 +48,12 @@ export default function Rsvp() {
     if (form.attending === null) next.attending = 'Let us know if you can make it.'
 
     if (form.attending === true) {
-      const pax = Number(form.pax)
-      if (!Number.isInteger(pax) || pax < 1 || pax > rsvp.maxPax)
+      const pax = form.pax.trim()
+      const paxNumber = Number(pax)
+      if (!pax) next.pax = 'Tell us how many seats to keep.'
+      else if (!Number.isInteger(paxNumber) || paxNumber < 1 || paxNumber > rsvp.maxPax)
         next.pax = `Pick a number between 1 and ${rsvp.maxPax}.`
     }
-
-    if (form.guestNames.length > 500) next.guestNames = 'Please keep this under 500 characters.'
-    if (form.message.length > 1000) next.message = 'Please keep this under 1000 characters.'
 
     return next
   }
@@ -100,8 +88,6 @@ export default function Rsvp() {
       return
     }
 
-    const dietary = [...dietaryPicks, form.dietaryOther.trim()].filter(Boolean).join(', ')
-
     // INSERT only. Never chain .select() here — RLS allows insert and not
     // select, so a select would error on a row that saved perfectly well.
     const { error } = await supabase.from('rsvps').insert([
@@ -110,14 +96,13 @@ export default function Rsvp() {
         phone: normalisePhone(form.phone),
         attending: form.attending,
         pax: form.attending ? Number(form.pax) : 0,
-        guest_names: form.guestNames.trim() || null,
-        dietary: dietary.slice(0, 300) || null,
-        side: form.side || null,
-        message: form.message.trim() || null,
       },
     ])
 
     if (error) {
+      // The guest sees a calm sentence; we need the real reason. Without this,
+      // a missing table and a dropped connection look identical from the page.
+      console.error('RSVP insert failed:', error)
       setStatus('error')
       setSubmitError('Couldn’t save your RSVP. Check your connection and try again.')
       return
@@ -129,7 +114,6 @@ export default function Rsvp() {
   /* ---------------------------------------------------------------- done */
   if (status === 'done') {
     const attending = form.attending === true
-    const seats = Number(form.pax)
 
     return (
       <Section id="rsvp" label="Your reply">
@@ -142,21 +126,25 @@ export default function Rsvp() {
             tabIndex={-1}
             className="relative overflow-hidden px-6 pt-12 pb-44 text-center sm:px-8 sm:pt-14"
           >
-            <p className="ticket-data text-[0.6rem] text-rail">
-              {couple.groom.first} &amp; {couple.bride.first} · {wedding.dateShort}
+            <p className="heading-display text-[2.5rem] text-rail">
+              {couple.groom.first}{' '}
+              <br/>
+              <span aria-hidden="true" className="text-seal text-[1.6rem]">
+                ♥
+              </span>
+              <br/>
+              <span className="sr-only">and</span> {couple.bride.first}
             </p>
-            <p className="heading-display mt-3 text-[2.2rem] text-ink">
-              {attending ? 'Thank you — see you in Kluang.' : 'Thank you for letting us know.'}
-            </p>
-            <p className="mx-auto mt-3 max-w-sm text-[0.95rem] leading-relaxed text-kopi">
+            <p className="ticket-data mt-3 text-[2.0rem] text-ink">Thank you</p>
+            <p className="mx-auto mt-3 max-w-sm text-[1.0rem] leading-relaxed text-kopi">
               {attending
-                ? `We have you down for ${seats} ${seats === 1 ? 'seat' : 'seats'}, ${form.fullName.trim()}. We will send the finer details closer to the day.`
-                : `We will miss you, ${form.fullName.trim()} — but thank you for replying. There will be photos.`}
+                ? `See you on ${wedding.dateNumeric}, ${wedding.dayLabel} ${wedding.timeStart} at ${wedding.city}`
+                : `We will miss you! Thanks for getting us know.`}
             </p>
 
             {/* The one bold moment. It lands in the lower band of the stub so it
                 reads as stamped onto the ticket without burying the message. */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-9 flex justify-center">
+            <div className="pointer-events-none absolute inset-x-0 bottom-15 flex justify-center">
               <div
                 className={`stamp mix-blend-multiply ${attending ? 'text-seal' : 'text-rail'}`}
                 aria-hidden="true"
@@ -165,16 +153,11 @@ export default function Rsvp() {
                   className={`border-[3px] p-1 opacity-90 ${attending ? 'border-seal' : 'border-rail'}`}
                 >
                   <div
-                    className={`border px-5 py-3 ${attending ? 'border-seal/60' : 'border-rail/60'}`}
+                    className={`border px-8 py-5 ${attending ? 'border-seal/60' : 'border-rail/60'}`}
                   >
-                    <p className="ticket-data text-[0.82rem] font-bold whitespace-nowrap">
-                      {attending ? 'Seats reserved' : 'Reply received'}
+                    <p className="ticket-data text-[1.0rem] font-bold whitespace-nowrap">
+                      {attending ? 'Reserved' : 'Received'}
                     </p>
-                    {attending && (
-                      <p className="ticket-data mt-1.5 text-[0.6rem] whitespace-nowrap">
-                        {seats} {seats === 1 ? 'seat' : 'seats'}
-                      </p>
-                    )}
                   </div>
                 </div>
               </div>
@@ -311,110 +294,28 @@ export default function Rsvp() {
             </fieldset>
 
             {form.attending === true && (
-              <>
-                <Field
-                  id="pax"
-                  label="Number of seats"
-                  hint="Including yourself."
-                  error={errors.pax}
-                >
-                  {(p) => (
-                    <input
-                      {...p}
-                      type="number"
-                      inputMode="numeric"
-                      min="1"
-                      max={rsvp.maxPax}
-                      step="1"
-                      className={`${inputClass} font-ticket`}
-                      value={form.pax}
-                      onChange={set('pax')}
-                    />
-                  )}
-                </Field>
-
-                <Field
-                  id="guestNames"
-                  label="Who is coming with you"
-                  hint="Optional. It helps us with the place cards."
-                  error={errors.guestNames}
-                >
-                  {(p) => (
-                    <textarea
-                      {...p}
-                      rows={3}
-                      className={inputClass}
-                      value={form.guestNames}
-                      onChange={set('guestNames')}
-                    />
-                  )}
-                </Field>
-
-                <div>
-                  <span className="ticket-data block text-[0.66rem] text-kopi">Dietary needs</span>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {rsvp.dietaryChips.map((chip) => {
-                      const active = dietaryPicks.includes(chip)
-                      return (
-                        <button
-                          key={chip}
-                          type="button"
-                          aria-pressed={active}
-                          onClick={() => toggleDietary(chip)}
-                          className={`border px-3.5 py-1.5 text-[0.85rem] transition-colors ${
-                            active
-                              ? 'border-ink bg-ink text-paper'
-                              : 'border-rail text-kopi hover:border-ochre'
-                          }`}
-                        >
-                          {chip}
-                        </button>
-                      )
-                    })}
-                  </div>
-
-                  <label htmlFor="dietaryOther" className="sr-only">
-                    Any other dietary needs
-                  </label>
+              <Field
+                id="pax"
+                label="Number of seats"
+                required
+                hint="Including yourself."
+                error={errors.pax}
+              >
+                {(p) => (
                   <input
-                    id="dietaryOther"
-                    type="text"
-                    placeholder="Anything else we should know?"
-                    className={`${inputClass} mt-2`}
-                    value={form.dietaryOther}
-                    onChange={set('dietaryOther')}
+                    {...p}
+                    type="number"
+                    inputMode="numeric"
+                    min="1"
+                    max={rsvp.maxPax}
+                    step="1"
+                    className={`${inputClass} font-ticket`}
+                    value={form.pax}
+                    onChange={set('pax')}
                   />
-                </div>
-              </>
+                )}
+              </Field>
             )}
-
-            <Field id="side" label="Whose side" hint="Optional.">
-              {(p) => (
-                <select {...p} className={inputClass} value={form.side} onChange={set('side')}>
-                  <option value="">Prefer not to say</option>
-                  <option value="groom">{couple.groom.first}’s side</option>
-                  <option value="bride">{couple.bride.first}’s side</option>
-                  <option value="both">Both</option>
-                </select>
-              )}
-            </Field>
-
-            <Field
-              id="message"
-              label="A message for us"
-              hint="Optional, and very welcome."
-              error={errors.message}
-            >
-              {(p) => (
-                <textarea
-                  {...p}
-                  rows={4}
-                  className={inputClass}
-                  value={form.message}
-                  onChange={set('message')}
-                />
-              )}
-            </Field>
 
             {/* Honeypot. Bots fill this in; nobody else can see or tab to it. */}
             <div aria-hidden="true" className="absolute -left-[9999px] size-0 overflow-hidden">
