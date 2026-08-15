@@ -7,11 +7,9 @@ create table public.rsvps (
   full_name   text    not null check (char_length(trim(full_name)) between 2 and 100),
   phone       text    not null check (char_length(trim(phone)) between 7 and 20),
   attending   boolean not null,
-  pax         int     not null default 1 check (pax between 0 and 10),
-  guest_names text    check (char_length(guest_names) <= 500),
-  dietary     text    check (char_length(dietary) <= 300),
-  side        text    check (side in ('bride','groom','both')),
-  message     text    check (char_length(message) <= 1000)
+  -- No default. The form makes this a required answer, so a row arriving
+  -- without one is a bug worth failing loudly rather than quietly seating 1.
+  pax         int     not null check (pax between 0 and 10)
 );
 
 alter table public.rsvps enable row level security;
@@ -20,6 +18,23 @@ create policy "anyone can submit an rsvp"
   on public.rsvps for insert
   to anon
   with check (true);
+
+-- ---------------------------------------------------------------------------
+-- Already ran an older version of this file?
+--
+-- The table used to carry side, message, guest_names and dietary columns. The
+-- form no longer collects any of them. Run this once to bring an existing
+-- table into line - it keeps every row you have already collected:
+--
+--   alter table public.rsvps
+--     drop column if exists side,
+--     drop column if exists message,
+--     drop column if exists guest_names,
+--     drop column if exists dietary,
+--     alter column pax drop default;
+--
+-- Export the table to CSV first if you want to keep what those columns hold.
+-- ---------------------------------------------------------------------------
 
 -- ---------------------------------------------------------------------------
 -- The part people get wrong.

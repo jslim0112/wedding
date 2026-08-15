@@ -38,14 +38,21 @@ export const config = {
     dayLabel: 'Saturday',
     dateLong: '13 March 2027',
     dateShort: '13.03.2027',
+    // Slashed short form, used on the RSVP confirmation stub.
+    dateNumeric: '13/03/2027',
     timeLabel: '7:00 PM — 10:00 PM',
     // Short form for the narrow ticket-card column on a phone.
     timeCompact: '7 – 10 PM',
+    // Just the start, for lines that only need "when to turn up".
+    timeStart: '7:00 p.m.',
     place: 'Kluang · Johor',
+    // The town on its own, for sentences that read badly with the state.
+    city: 'Kluang',
   },
 
   venue: {
     name: 'Jaya Homestay Kluang',
+    name_zh: '居銮家雅民宿',
     address:
       'No. 9 Lorong 2, Jalan Sri Damai 1, Taman Sri Damai, 86000 Kluang, Johor',
     lat: 2.0522974,
@@ -55,14 +62,14 @@ export const config = {
     dressCode: '',
 
     parking:
-      'Free street parking along Lorong 2 and the surrounding lanes. It is a quiet residential street, so please park considerately and leave the neighbours’ driveways clear. Come 15 minutes early if you would rather not walk far.',
+      'Parking is provided',
+    parking_zh: '民宿旁边有提供停车位',
   },
 
   rsvp: {
     deadlineISO: '2026-12-31',
     deadlineLabel: '31 December 2026',
     maxPax: 10,
-    dietaryChips: ['Halal', 'Vegetarian', 'No beef'],
   },
 
   // First contact is the one shown in error messages.
@@ -73,7 +80,7 @@ export const config = {
 
   hero: {
     // TODO: paste the Supabase Storage public URL for the main photo.
-    photo: { src: '', alt: 'Jet Sheng and Mei Yean', slot: 'Hero photo — the two of you, landscape' },
+    photo: { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/cover_photo.jpeg?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC9jb3Zlcl9waG90by5qcGVnIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4Njc5ODM5MywiZXhwIjoxODE4MzM0MzkzfQ.FWozQLwgnQUflKO_uarltn_1Fco5Ab3CmUWOj7zb8c8', alt: 'Jason and Mei Yean', slot: 'Hero photo — the two of you, landscape' },
   },
 
   story: {

@@ -3,10 +3,10 @@ import { buildIcs, downloadIcs, googleMapsUrl, mapEmbedUrl, wazeUrl } from '../l
 import Section from './ui/Section'
 import Reveal from './ui/Reveal'
 
-function Row({ term, children }) {
+function Row({ term, term_zh, children }) {
   return (
     <div className="border-b border-rail/60 py-4 sm:grid sm:grid-cols-[8rem_1fr] sm:gap-4">
-      <dt className="ticket-data text-[0.6rem] text-rail sm:pt-1">{term}</dt>
+      <dt className="ticket-data text-[1.0rem] text-rail sm:pt-1"><b>{term} {term_zh}</b></dt>
       <dd className="mt-1 text-[1rem] leading-relaxed text-kopi sm:mt-0">{children}</dd>
     </div>
   )
@@ -28,20 +28,20 @@ export default function Details() {
   }
 
   return (
-    <Section id="details" label="The details" title="Getting there">
+    <Section id="details" title="Details" title_zh="详情">
       <Reveal>
         <dl className="border-t border-rail/60">
-          <Row term="Date">
-            {wedding.dayLabel}, {wedding.dateLong}
+          <Row term="Date" term_zh="日期">
+            {wedding.dayLabel}, {wedding.dateNumeric}
           </Row>
-          <Row term="Time">{wedding.timeLabel}</Row>
-          <Row term="Venue">
-            <span className="text-ink">{venue.name}</span>
+          <Row term="Time" term_zh="时间">{wedding.timeLabel}</Row>
+          <Row term="Venue" term_zh="地点">
+            <span className="text-ink">{venue.name} {venue.name_zh}</span>
             <br />
             {venue.address}
           </Row>
           {venue.dressCode && <Row term="Dress code">{venue.dressCode}</Row>}
-          <Row term="Parking">{venue.parking}</Row>
+          <Row term="Parking" term_zh="停车位">{venue.parking}<br/>{venue.parking_zh}</Row>
         </dl>
       </Reveal>
 
@@ -75,14 +75,6 @@ export default function Details() {
             Open in Google Maps
           </a>
         </div>
-
-        <button
-          type="button"
-          onClick={handleAddToCalendar}
-          className="ticket-data mt-4 w-full border border-dashed border-rail px-5 py-3 text-[0.62rem] text-kopi transition-colors hover:border-ochre hover:text-ink"
-        >
-          Add to your calendar
-        </button>
       </Reveal>
     </Section>
   )

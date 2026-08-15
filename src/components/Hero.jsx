@@ -4,7 +4,7 @@ function Name({ person }) {
   return (
     <span className="block">
       {person.full}
-      {person.zh && <span className="zh mt-2 block text-[0.28em] tracking-[0.12em]">{person.zh}</span>}
+      {person.zh && <span className="zh mt-0 block text-[1.8rem] tracking-[0.12em]">{person.zh}</span>}
     </span>
   )
 }
@@ -37,14 +37,13 @@ export default function Hero() {
 
       {/* Ticket header strip */}
       <div className="mx-auto w-full max-w-[680px] px-6 pt-6">
-        <div className="flex items-baseline justify-between border-b border-paper/25 pb-3">
-          <span className="ticket-data text-[0.8rem] text-paper/70">{wedding.place}</span>
-          <span className="ticket-data text-[0.8rem] text-paper/70">{wedding.dateShort}</span>
+        <div className="flex items-baseline justify-center border-b border-paper/25 pb-3">
+          <span className="ticket-data text-[0.8rem] text-paper/70">Right Time<b> · </b>Right Moment</span>
         </div>
       </div>
 
       {/* Names */}
-      <div className="mx-auto w-full max-w-[680px] px-6 py-10 text-center">
+      <div className="mx-auto w-full max-w-[680px] px-6 py-10 text-center mb-0">
         <p className="ticket-data mb-8 text-[1.2rem] text-paper/60"><b>You are invited</b></p>
 
         <h1 className="name-display text-[3.4rem] text-paper sm:text-[5.5rem]">
@@ -62,37 +61,26 @@ export default function Hero() {
           <span className="sr-only">and</span>
           <Name person={couple.bride} />
         </h1>
-
-        <p className="ticket-data mt-9 text-[0.62rem] leading-relaxed text-paper/75">
-          {wedding.dayLabel} · {wedding.dateLong}
-        </p>
       </div>
 
       {/* The ticket card */}
-      <div className="mx-auto w-full max-w-[680px] px-6 pb-10">
+      <div className="mx-auto w-full max-w-[680px] px-6 pb-20">
         <div className="flex border-l-4 border-ochre bg-card text-ink shadow-[0_1px_0_rgba(22,48,43,0.25)]">
           <div className="w-full px-5 py-5 sm:px-6">
             <dl className="grid grid-cols-2 gap-x-4 gap-y-4">
               <div className="min-w-0">
-                <dt className="ticket-data text-[0.58rem] text-rail">Date</dt>
-                <dd className="ticket-data mt-1 text-[0.72rem] text-ink">{wedding.dateShort}</dd>
+                <dt className="ticket-data text-[0.8rem] text-rail">Date 日期</dt>
+                <dd className="ticket-data mt-0 text-[0.9rem] text-ink">{wedding.dateNumeric}</dd>
               </div>
               <div className="min-w-0">
-                <dt className="ticket-data text-[0.58rem] text-rail">Time</dt>
-                <dd className="ticket-data mt-1 text-[0.72rem] text-ink">{wedding.timeCompact}</dd>
+                <dt className="ticket-data text-[0.8rem] text-rail">Time 时间</dt>
+                <dd className="ticket-data mt-0 text-[0.9rem] text-ink">{wedding.timeCompact}</dd>
               </div>
               <div className="col-span-2">
-                <dt className="ticket-data text-[0.58rem] text-rail">Boarding at</dt>
-                <dd className="mt-1 text-[0.95rem] leading-snug text-ink">{venue.name}</dd>
+                <dt className="ticket-data text-[0.8rem] text-rail">Venue 地点</dt>
+                <dd className="mt-0 text-[0.9rem] leading-snug text-ink">{venue.name} {venue.name_zh}</dd>
               </div>
             </dl>
-
-            <a
-              href="#rsvp"
-              className="mt-5 block w-full bg-ink px-5 py-3.5 text-center text-[0.95rem] font-medium text-paper transition-colors hover:bg-kopi"
-            >
-              Reserve your seats
-            </a>
           </div>
         </div>
       </div>
