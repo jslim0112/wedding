@@ -27,7 +27,7 @@ export default function Field({
 
   return (
     <div className={className}>
-      <label htmlFor={id} className="ticket-data block text-[0.66rem] text-kopi">
+      <label htmlFor={id} className="ticket-data block text-[0.8rem] text-kopi">
         {label}
         {required && (
           <>
