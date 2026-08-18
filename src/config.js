@@ -68,8 +68,8 @@ export const config = {
 
   rsvp: {
     deadlineISO: '2026-12-31',
-    deadlineLabel: '31 December 2026',
-    maxPax: 10,
+    deadlineLabel: '31/12/2026',
+    maxPax: 20,
   },
 
   // First contact is the one shown in error messages.

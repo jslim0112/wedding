@@ -24,6 +24,11 @@ export default function Section({ id, label, title, title_zh, children, classNam
               {title} <span className="text-[1.8rem]">{title_zh}</span>
             </h2>
           )}
+          {title && !title_zh && (
+            <h2 className="heading-display mt-2 text-[2.6rem] text-ink sm:text-[3.4rem]">
+              {title}
+            </h2>
+          )}
         </Reveal>
       )}
 

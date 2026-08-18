@@ -72,6 +72,51 @@ export function getTimeLeft(targetISO, now = Date.now()) {
   }
 }
 
+/**
+ * The wedding month laid out as a Monday-first grid, for the calendar card.
+ *
+ * The date parts are read straight off the ISO string and every calculation
+ * runs through UTC, so no local offset can shift the highlighted day — a guest
+ * opening this in Honolulu still sees the 13th ringed, not the 12th.
+ *
+ * Returns null for anything that is not an ISO date, so the card can simply
+ * not render rather than throw.
+ */
+export function getMonthMatrix(targetISO) {
+  const parts = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(targetISO ?? ''))
+  if (!parts) return null
+
+  const year = Number(parts[1])
+  const month = Number(parts[2]) // 1-12, not the 0-11 Date uses
+  const day = Number(parts[3])
+
+  // Sunday is 0 in JS. The card runs Monday to Sunday, so shift the week round.
+  const mondayFirst = (jsDay) => (jsDay + 6) % 7
+
+  const firstColumn = mondayFirst(new Date(Date.UTC(year, month - 1, 1)).getUTCDay())
+  // Day 0 of the next month is the last day of this one.
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate()
+
+  const cells = [
+    ...Array(firstColumn).fill(null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+  ]
+  // Pad the last row out so the grid stays rectangular.
+  while (cells.length % 7) cells.push(null)
+
+  const weeks = []
+  for (let i = 0; i < cells.length; i += 7) weeks.push(cells.slice(i, i + 7))
+
+  return {
+    year,
+    month,
+    day,
+    // 0 = Monday, matching the column order printed on the card.
+    weekdayIndex: mondayFirst(new Date(Date.UTC(year, month - 1, day)).getUTCDay()),
+    weeks,
+  }
+}
+
 /* --------------------------------------------------------------------------
    Calendar file, generated client-side
 -------------------------------------------------------------------------- */
