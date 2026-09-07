@@ -50,7 +50,7 @@ export default function Countdown() {
   const month = getMonthMatrix(wedding.startISO)
 
   return (
-    <Section id="countdown" label="Departure in" title="Time" title_zh="婚礼时间">
+    <Section id="countdown" label="" title="Time" title_zh="婚礼时间">
       <Reveal>
         {month && (
           <div className="mb-8 text-center">

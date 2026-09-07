@@ -7,7 +7,7 @@ export default function Footer() {
   return (
     <footer className="bg-ink text-paper">
       <div className="mx-auto w-full max-w-[680px] px-6 pt-16 pb-26 text-center sm:py-20">
-        <p className="ticket-data text-[0.6rem] text-paper/55">End of line</p>
+        <p className="ticket-data text-[0.6rem] text-paper/55"></p>
         <p className="mx-auto mt-4 max-w-md text-[1rem] leading-relaxed text-paper/80">
           {footer.thanks}
         </p>

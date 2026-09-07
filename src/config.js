@@ -32,7 +32,10 @@ export const config = {
     // The source of truth for the countdown and the calendar file.
     // Malaysia is UTC+8, so the offset is baked in and the countdown is
     // correct for a guest opening this from anywhere in the world.
-    startISO: '2027-03-13T19:00:00+08:00',
+    // 6:30 PM is when guests check in — the 5:00 PM tea ceremony is a family
+    // affair and appears in the agenda only, so it is deliberately not the
+    // time the countdown runs to or the calendar file books.
+    startISO: '2027-03-13T18:30:00+08:00',
     endISO: '2027-03-13T22:00:00+08:00',
 
     dayLabel: 'Saturday',
@@ -40,11 +43,11 @@ export const config = {
     dateShort: '13.03.2027',
     // Slashed short form, used on the RSVP confirmation stub.
     dateNumeric: '13/03/2027',
-    timeLabel: '7:00 PM — 10:00 PM',
+    timeLabel: '6:30 PM — 10:00 PM',
     // Short form for the narrow ticket-card column on a phone.
-    timeCompact: '7 – 10 PM',
+    timeCompact: '6.30 – 10 PM',
     // Just the start, for lines that only need "when to turn up".
-    timeStart: '7:00 p.m.',
+    timeStart: '6:30 p.m.',
     place: 'Kluang · Johor',
     // The town on its own, for sentences that read badly with the state.
     city: 'Kluang',
@@ -66,9 +69,40 @@ export const config = {
     parking_zh: '民宿旁边有提供停车位',
   },
 
+  /* The run of the evening, printed as a line of stops.
+     Times are shown exactly as typed here — nothing is parsed — so write them
+     however they should read. Add or remove stops and the timeline follows.
+
+     `icon` picks the drawing above each stop. One of: camera, ticket, tea,
+     rings, arch, plate, cutlery, cheers, guitar, music, beer, fireworks,
+     hearts. Leave it out and the stop simply has no picture.
+
+     Stops alternate left and right of the ribbon in the order written here,
+     so adding or removing one re-flows the whole timeline.
+     Leave `items` empty and the section disappears from the page. */
+  agenda: {
+    items: [
+      { time: '5:00 PM', title: 'Tea ceremony', title_zh: '长辈敬茶', icon: 'tea' },
+      { time: '6:30 PM', title: 'Check-in & photo session', title_zh: '签到 & 拍照留念', icon: 'camera' },
+      { time: '7:00 PM', title: 'Wedding buffet', title_zh: '自助式晚餐', icon: 'plate' },
+      {
+        time: '8:00 PM',
+        title: 'Toasts, lucky draw & fireworks',
+        title_zh: '敬酒环节、幸运抽奖、烟花表演',
+        icon: 'fireworks',
+      },
+      { time: '9:00 PM', title: 'Free & easy', title_zh: '自由活动', icon: 'cheers' },
+    ],
+
+    // An optional line under the timeline. Both blank and it does not render.
+    // e.g. note: 'Capture the love, share the joy — tag us @jason @meiyean'
+    note: '',
+    note_zh: '',
+  },
+
   rsvp: {
-    deadlineISO: '2026-12-31',
-    deadlineLabel: '31/12/2026',
+    deadlineISO: '2026-11-30',
+    deadlineLabel: '30/11/2026',
     maxPax: 20,
   },
 
@@ -99,11 +133,11 @@ export const config = {
 
   // 6 to 12 photos reads best. TODO: paste Supabase Storage public URLs.
   gallery: [
-    { src: '', alt: '', slot: 'Gallery 1' },
+    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2023.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDIzLmpwZWciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4NzkwOTA2LCJleHAiOjE4MjAzMjY5MDZ9.8o46vQyllP2perlmIlb5yCrLyqBJC2v3eyNquYraUmw', alt: '', slot: 'Gallery 1' },
     { src: '', alt: '', slot: 'Gallery 2' },
-    { src: '', alt: '', slot: 'Gallery 3' },
+    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2025_alin_concert.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI1X2FsaW5fY29uY2VydC5qcGVnIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc5MDk1MiwiZXhwIjoxODIwMzI2OTUyfQ.WYOcctVycRK18qpu2J0QsFMHL_30qKs4KlIvfjkTrPg', alt: '', slot: 'Gallery 3' },
     { src: '', alt: '', slot: 'Gallery 4' },
-    { src: '', alt: '', slot: 'Gallery 5' },
+    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2026_skyline.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI2X3NreWxpbmUuanBlZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODg3OTA5OTcsImV4cCI6MTgyMDMyNjk5N30.FBLaTwg-R-HIV4_iyAruIJo1yo_Ivojril5xKEkmz5E', alt: '', slot: 'Gallery 5' },
     { src: '', alt: '', slot: 'Gallery 6' },
   ],
 
@@ -145,7 +179,7 @@ export const config = {
 
   footer: {
     thanks:
-      'Thank you for making the trip. It is a long way to come for one evening, and it means a great deal that you would.',
+      'THANK YOU & SEE YOU SOON!',
     whatsappPrefill: 'Hi! I have a question about the wedding on 13 March.',
   },
 }

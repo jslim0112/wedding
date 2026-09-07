@@ -3,6 +3,7 @@ import Countdown from './components/Countdown'
 import Story from './components/Story'
 import Gallery from './components/Gallery'
 import Details from './components/Details'
+import Agenda from './components/Agenda'
 import Rsvp from './components/Rsvp'
 import { useRef } from 'react'
 import Footer from './components/Footer'
@@ -29,9 +30,9 @@ export default function App() {
         />
 
         <Countdown />
-        <Story />
         <Gallery />
         <Details />
+        <Agenda />
         <Rsvp />
       </main>
 
