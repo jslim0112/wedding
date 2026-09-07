@@ -50,7 +50,7 @@ export default function Gallery() {
   const current = openAt === null ? null : viewable[openAt]
 
   return (
-    <Section id="gallery" label="Album" title="A few of our favourites">
+    <Section id="gallery" label="" title="A Fews of Our Favourites">
       <Reveal className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
         {photos.map((photo, i) => {
           const position = viewable.findIndex((p) => p.gridIndex === i)

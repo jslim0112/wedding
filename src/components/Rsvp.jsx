@@ -201,7 +201,7 @@ export default function Rsvp() {
 
           <div className="space-y-6 px-5 py-7 sm:px-7">
             <div className="flex items-baseline justify-between border-b border-rail/60 pb-4">
-              <span className="ticket-data text-[0.6rem] text-rail">Boarding pass</span>
+              <span className="ticket-data text-[0.6rem] text-rail">Wedding Ticket</span>
               <span className="ticket-data text-[0.6rem] text-rail">{wedding.dateNumeric}</span>
             </div>
 
