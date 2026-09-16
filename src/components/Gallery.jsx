@@ -244,8 +244,12 @@ export default function Gallery() {
 
                     {(photo.caption || photo.caption_zh) && (
                       <figcaption className="mt-3 px-1 text-center">
+                        {/* whitespace-pre-line honours a \n written into a
+                            caption in config.js — that is what puts the year
+                            on its own line — while still collapsing ordinary
+                            runs of spaces and wrapping long lines normally. */}
                         {photo.caption && (
-                          <p className="font-caption text-[1.8rem] leading-snug text-ink">
+                          <p className="font-caption text-[1.8rem] leading-snug whitespace-pre-line text-ink">
                             {photo.caption}
                           </p>
                         )}
@@ -338,7 +342,7 @@ export default function Gallery() {
                   Chinese below keeps its serif — the caption face, like any
                   Latin display face, carries no CJK glyphs. */}
               {current.caption && (
-                <p className="font-caption text-[1.6rem] leading-snug text-paper/90">
+                <p className="font-caption text-[1.6rem] leading-snug whitespace-pre-line text-paper/90">
                   {current.caption}
                 </p>
               )}
