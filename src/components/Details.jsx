@@ -1,5 +1,5 @@
 import { config } from '../config'
-import { buildIcs, downloadIcs, googleMapsUrl, mapEmbedUrl, wazeUrl } from '../lib/format'
+import { googleMapsUrl, mapEmbedUrl, wazeUrl } from '../lib/format'
 import Section from './ui/Section'
 import Reveal from './ui/Reveal'
 
@@ -13,19 +13,7 @@ function Row({ term, term_zh, children }) {
 }
 
 export default function Details() {
-  const { wedding, venue, couple, site } = config
-
-  const handleAddToCalendar = () => {
-    const ics = buildIcs({
-      title: `${couple.groom.first} & ${couple.bride.first}’s wedding`,
-      description: `We're getting married at ${venue.name}, Kluang. ${site.url}`,
-      location: `${venue.name}, ${venue.address}`,
-      startISO: wedding.startISO,
-      endISO: wedding.endISO,
-      url: site.url,
-    })
-    downloadIcs(ics, 'kluang-wedding.ics')
-  }
+  const { wedding, venue } = config
 
   return (
     <Section id="details" title="Details" title_zh="详情">

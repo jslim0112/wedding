@@ -125,7 +125,7 @@ A few worth knowing:
 | Displayed date text | `wedding.dateLong`, `dateShort`, `timeLabel` | Change these too — they are not generated from the ISO date. |
 | Dress code | `venue.dressCode` | Currently empty, so that row is hidden. Type something and the row appears. |
 | RSVP deadline | `rsvp.deadlineLabel` | Shown above the form. |
-| Max seats per reply | `rsvp.maxPax` | Also capped at 10 by the database. |
+| Max seats per reply | `rsvp.maxPax` | The cap on adults + children together. The database enforces the same ceiling — raise it here and in `supabase/schema.sql` together, or the form will accept a party the table then refuses. |
 
 ---
 

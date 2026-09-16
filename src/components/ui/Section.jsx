@@ -5,7 +5,15 @@ import Reveal from './Reveal'
  * sits on the route line running down the left edge. The marker and the line
  * are desktop-only and deliberately quiet.
  */
-export default function Section({ id, label, title, title_zh, children, className = '' }) {
+export default function Section({
+  id,
+  label,
+  label_zh,
+  title,
+  title_zh,
+  children,
+  className = '',
+}) {
   return (
     <section
       id={id}
@@ -16,9 +24,14 @@ export default function Section({ id, label, title, title_zh, children, classNam
         className="pointer-events-none absolute top-[4.9rem] left-0 hidden size-[9px] -translate-x-1/2 rounded-full border border-rail bg-paper lg:block"
       />
 
-      {(label || title || title_zh) && (
+      {(label || label_zh || title || title_zh) && (
         <Reveal as="header" className="mb-8">
-          {label && <p className="ticket-data text-[0.68rem] text-rail">{label}</p>}
+          {(label || label_zh) && (
+            <p className="ticket-data text-[0.68rem] text-rail">
+              {label}
+              {label_zh && <span className="zh ml-1.5 normal-case">{label_zh}</span>}
+            </p>
+          )}
           {title && title_zh && (
             <h2 className="heading-display mt-2 text-[2.6rem] text-ink sm:text-[3.4rem]">
               {title} <span className="text-[1.8rem]">{title_zh}</span>
