@@ -175,6 +175,22 @@ export function buildIcs({ title, description, location, startISO, endISO, url }
   return lines.map(foldLine).join('\r\n')
 }
 
+/**
+ * A "add this to my calendar" link for Google Calendar's web form. Google wants
+ * the two stamps in UTC, joined by a slash - the same shape the .ics file uses,
+ * so both readings of the day come from one source.
+ */
+export function googleCalendarUrl({ title, description, location, startISO, endISO }) {
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: title ?? '',
+    dates: `${toIcsStamp(startISO)}/${toIcsStamp(endISO)}`,
+    details: description ?? '',
+    location: location ?? '',
+  })
+  return `https://calendar.google.com/calendar/render?${params.toString()}`
+}
+
 export function downloadIcs(icsText, filename = 'wedding.ics') {
   const blob = new Blob([icsText], { type: 'text/calendar;charset=utf-8' })
   const href = URL.createObjectURL(blob)

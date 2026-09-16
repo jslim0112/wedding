@@ -39,6 +39,7 @@ export const config = {
     endISO: '2027-03-13T22:00:00+08:00',
 
     dayLabel: 'Saturday',
+    dayLabel_zh: '星期六',
     dateLong: '13 March 2027',
     dateShort: '13.03.2027',
     // Slashed short form, used on the RSVP confirmation stub.
@@ -51,6 +52,7 @@ export const config = {
     place: 'Kluang · Johor',
     // The town on its own, for sentences that read badly with the state.
     city: 'Kluang',
+    city_zh: '居銮',
   },
 
   venue: {
@@ -86,7 +88,7 @@ export const config = {
       { time: '6:30 PM', title: 'Check-in & photo session', title_zh: '签到 & 拍照留念', icon: 'camera' },
       { time: '7:00 PM', title: 'Wedding buffet', title_zh: '自助式晚餐', icon: 'plate' },
       {
-        time: '8:00 PM',
+        time: '8:30 PM',
         title: 'Toasts, lucky draw & fireworks',
         title_zh: '敬酒环节、幸运抽奖、烟花表演',
         icon: 'fireworks',
@@ -131,14 +133,29 @@ export const config = {
     ],
   },
 
-  // 6 to 12 photos reads best. TODO: paste Supabase Storage public URLs.
+  /* The carousel, one photo at a time. 6 to 12 photos reads best.
+
+     `caption` is the line printed under the photo, and `caption_zh` the
+     Chinese under that — write either, both, or neither. A photo with both
+     blank simply has no caption, and the one on show also carries its caption
+     into the full-screen view.
+     TODO: paste Supabase Storage public URLs and write the captions. */
   gallery: [
-    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2023.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDIzLmpwZWciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4NzkwOTA2LCJleHAiOjE4MjAzMjY5MDZ9.8o46vQyllP2perlmIlb5yCrLyqBJC2v3eyNquYraUmw', alt: '', slot: 'Gallery 1' },
-    { src: '', alt: '', slot: 'Gallery 2' },
-    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2025_alin_concert.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI1X2FsaW5fY29uY2VydC5qcGVnIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc5MDk1MiwiZXhwIjoxODIwMzI2OTUyfQ.WYOcctVycRK18qpu2J0QsFMHL_30qKs4KlIvfjkTrPg', alt: '', slot: 'Gallery 3' },
-    { src: '', alt: '', slot: 'Gallery 4' },
-    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2026_skyline.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI2X3NreWxpbmUuanBlZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODg3OTA5OTcsImV4cCI6MTgyMDMyNjk5N30.FBLaTwg-R-HIV4_iyAruIJo1yo_Ivojril5xKEkmz5E', alt: '', slot: 'Gallery 5' },
-    { src: '', alt: '', slot: 'Gallery 6' },
+    { src: '', alt: '', slot: 'Gallery 8', caption: 'YEAR 2026 Our ROM', caption_zh: '' },
+    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2026%20Krabi.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI2IEtyYWJpLmpwZWciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg5NTUxNTg4LCJleHAiOjE4MjEwODc1ODh9.3Jx-5RelRcyAdfc2N_FAUdF75JthQxRJ98KGmZJhuzI', alt: '', slot: 'Gallery 1', caption: 'YEAR 2026 Krabi Trip', caption_zh: '' },
+    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2026%20BKK.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI2IEJLSy5qcGVnIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4OTU0OTQwOSwiZXhwIjoxODIxMDg1NDA5fQ.2S_nmCscS-1qLHd8z6tvPKMCSry3NE8gC9-IziMcROg', alt: '', slot: 'Gallery 2', caption: 'YEAR 2026 Bangkok Trip', caption_zh: '' },
+    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2025_alin_concert.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI1X2FsaW5fY29uY2VydC5qcGVnIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc5MDk1MiwiZXhwIjoxODIwMzI2OTUyfQ.WYOcctVycRK18qpu2J0QsFMHL_30qKs4KlIvfjkTrPg', alt: '', slot: 'Gallery 3', caption: 'YEAR 2025 A-Lin Concert', caption_zh: '' },
+    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2025_guangzhou.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI1X2d1YW5nemhvdS5qcGVnIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4OTU0NjE2MywiZXhwIjoxODIxMDgyMTYzfQ.yV4FRuEK_bvTfj4D46A1Xx8mU_iPpbvZ3RooEITvpbg', alt: '', slot: 'Gallery 4', caption: 'YEAR 2025 Guangzhou Trip', caption_zh: '' },
+    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2025_phuket.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI1X3BodWtldC5qcGVnIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4OTU0NjIzNCwiZXhwIjoxODIxMDgyMjM0fQ.XvrfJXcoBGASMNO6VmNd0YPEuugiN_1UvU-TKNFZAQ0', alt: '', slot: 'Gallery 5', caption: 'YEAR 2025 Phuket Trip', caption_zh: '' },
+    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2025_cameron.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI1X2NhbWVyb24uanBlZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODk1NTIzNzUsImV4cCI6MTgyMTA4ODM3NX0.8jT0GQAH92fK2ofMN0W2QBvOoQNwueE7eBOv3sjYCGo', alt: '', slot: 'Gallery 6', caption: 'YEAR 2025 Cameron Highland Trip', caption_zh: '' },
+    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2024_ipoh.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI0X2lwb2guanBlZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODk1NTE2MzgsImV4cCI6MTgyMTA4NzYzOH0.JG1fY9UAs52l-pQuRiWpgZXkfEDHFXKFpAHNEBHF7Lw', alt: '', slot: 'Gallery 7', caption: 'YEAR 2024 Ipoh Trip ', caption_zh: '' },
+    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2024_taiwan.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI0X3RhaXdhbi5qcGVnIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4OTU0NjA5NywiZXhwIjoxODIxMDgyMDk3fQ.Fw8zJQBH-hZmfpSe7t6W85c8aG6y4K5lT8wnKKKT0mg', alt: '', slot: 'Gallery 8', caption: 'YEAR 2024 Taiwan Trip ', caption_zh: '' },
+    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2024_baking_exp.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI0X2Jha2luZ19leHAuanBlZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODk1NTI1OTksImV4cCI6MTgyMTA4ODU5OX0.46HbHSF0AzaAvxG0tRq6ifEMZX6o0M67WrdJ1QvsyRI', alt: '', slot: 'Gallery 9', caption: 'YEAR 2024 Baking Time ', caption_zh: '' },
+    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2023.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDIzLmpwZWciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4NzkwOTA2LCJleHAiOjE4MjAzMjY5MDZ9.8o46vQyllP2perlmIlb5yCrLyqBJC2v3eyNquYraUmw', alt: '', slot: 'Gallery 10', caption: 'YEAR 2023 Valentine\'s Day ', caption_zh: '' },
+    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2022_MY%20Convo.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDIyX01ZIENvbnZvLmpwZWciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg5NTUxMzQzLCJleHAiOjE4MjEwODczNDN9.8X1XUpWjCWPDKKZAZv5axVlf-ZYN7Hls657wCsXQVH4', alt: '', slot: 'Gallery 11', caption: 'YEAR 2022 Meiyean\'s Convo', caption_zh: '' },
+    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2022_JS%20Convo.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDIyX0pTIENvbnZvLmpwZWciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg5NTUxMzM2LCJleHAiOjE4MjEwODczMzZ9.3d-KSlAKHXUzxaOKaYs7I8W4O49TteUyPbs4EI5VHdo', alt: '', slot: 'Gallery 12', caption: 'YEAR 2022 Jason\'s Convo ', caption_zh: '' },
+    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2021.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDIxLmpwZWciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg5NTQ5NDQyLCJleHAiOjE4MjEwODU0NDJ9.hY0Thj__wwep3slTaSF57JHenTxYs56lSmeZa7InGLU', alt: '', slot: 'Gallery 13', caption: 'YEAR 2021 Valentine\'s Day ', caption_zh: '' },
+    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2020.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDIwLmpwZWciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg5NTQ5NDI3LCJleHAiOjE4MjEwODU0Mjd9.ykTPmnsKb0dr_GqfeSs8JPFZfci9pYY-2gwIKyCudUY', alt: '', slot: 'Gallery 14', caption: 'YEAR 2020 First Dating', caption_zh: '' },
   ],
 
   /* The floating music player, bottom-left of every screen.

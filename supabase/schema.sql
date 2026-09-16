@@ -7,9 +7,16 @@ create table public.rsvps (
   full_name   text    not null check (char_length(trim(full_name)) between 2 and 100),
   phone       text    not null check (char_length(trim(phone)) between 7 and 20),
   attending   boolean not null,
+  -- The form asks for these two separately - the caterer counts a child's seat
+  -- differently from an adult's. A guest who cannot come sends 0 and 0.
+  adults      int     not null check (adults   between 0 and 20),
+  children    int     not null check (children between 0 and 20),
   -- No default. The form makes this a required answer, so a row arriving
   -- without one is a bug worth failing loudly rather than quietly seating 1.
-  pax         int     not null check (pax between 0 and 10)
+  -- Kept as the total of the two above: it is what the seating plan is counted
+  -- from, and it keeps rows collected before the split comparable with the
+  -- ones after it.
+  pax         int     not null check (pax between 0 and 20)
 );
 
 alter table public.rsvps enable row level security;
@@ -21,6 +28,33 @@ create policy "anyone can submit an rsvp"
 
 -- ---------------------------------------------------------------------------
 -- Already ran an older version of this file?
+--
+-- RUN THIS BEFORE THE SPLIT FORM GOES LIVE. Until these columns exist, every
+-- RSVP fails with "Couldn't save your RSVP" - the insert names adults and
+-- children, and Postgres rejects a column it does not have.
+--
+-- Existing rows keep their pax and are backfilled as all-adults, which is what
+-- they meant when the form only asked for a total:
+--
+--   alter table public.rsvps
+--     add column if not exists adults   int not null default 0,
+--     add column if not exists children int not null default 0;
+--
+--   update public.rsvps set adults = pax where adults = 0 and pax > 0;
+--
+--   alter table public.rsvps
+--     alter column adults   drop default,
+--     alter column children drop default;
+--
+-- The pax ceiling used to be 10 while the form allowed up to 20, so a party of
+-- 11 was accepted by the page and then refused by the table. Lift it to match
+-- config.js (rsvp.maxPax) and constrain the two new columns the same way:
+--
+--   alter table public.rsvps
+--     drop constraint if exists rsvps_pax_check,
+--     add  constraint rsvps_pax_check      check (pax      between 0 and 20),
+--     add  constraint rsvps_adults_check   check (adults   between 0 and 20),
+--     add  constraint rsvps_children_check check (children between 0 and 20);
 --
 -- The table used to carry side, message, guest_names and dietary columns. The
 -- form no longer collects any of them. Run this once to bring an existing

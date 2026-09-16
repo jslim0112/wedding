@@ -5,7 +5,13 @@
       "PowerShell(npm -v)",
       "PowerShell(\"---node---\")",
       "PowerShell(\"---npm---\")",
-      "PowerShell(\"---git---\")"
+      "PowerShell(\"---git---\")",
+      "Bash(ls \"/c/Program Files \\(x86\\)/Microsoft/Edge/Application/msedge.exe\" \"/c/Program Files/Google/Chrome/Application/chrome.exe\" 2>&1; echo \"---\"; cat \"d:/Desktop/Wedding/index.html\")",
+      "Bash(npx vite *)",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless --disable-gpu --hide-scrollbars --virtual-time-budget=4000 --screenshot=agenda-desktop.png --window-size=900,1600 \"http://localhost:5199/wedding/preview-agenda.html\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --no-sandbox --disable-gpu --hide-scrollbars --virtual-time-budget=5000 --window-size=900,1700 --screenshot=\"C:\\\\Users\\\\Jason\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Desktop-Wedding\\\\e0bc3105-328f-45d6-8c5a-f66b3c2a607a\\\\scratchpad\\\\agenda-desktop.png\" \"http://localhost:5199/wedding/preview-agenda.html\")",
+      "Bash(echo \"exit=$?\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --no-sandbox --disable-gpu --hide-scrollbars --user-data-dir=\"C:\\\\Users\\\\Jason\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Desktop-Wedding\\\\e0bc3105-328f-45d6-8c5a-f66b3c2a607a\\\\scratchpad\\\\cpH\" --virtual-time-budget=7000 --window-size=500,1150 --screenshot=\"C:\\\\Users\\\\Jason\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\d--Desktop-Wedding\\\\e0bc3105-328f-45d6-8c5a-f66b3c2a607a\\\\scratchpad\\\\sched-mob.png\" \"http://localhost:5199/wedding/preview-agenda.html?phone\")"
     ]
   }
 }
