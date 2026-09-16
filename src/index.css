@@ -29,18 +29,15 @@
   /* Ticket data is Open Sans too - the pairing is two families, so printed
      labels get their character from letterspaced small caps, not a third face. */
   --font-ticket: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
-  /* Gallery captions, in two halves.
+  /* Gallery captions. Titan One and nothing else on purpose.
 
-     Snap ITC ships with Microsoft Office rather than Google Fonts, so it
-     cannot be downloaded to a guest who lacks it - it is named first, and
-     renders for anyone who already has it installed (most Windows machines
-     with Office, including the one this was built on).
-
-     Titan One is the safety net and does the real work: it is the closest
-     free face Google Fonts serves - same fat, rounded, heavy display voice -
-     so a guest on a phone, where Snap ITC never exists, still sees the look
-     rather than a plain sans. Most guests will see this one. */
-  --font-caption: 'Snap ITC', 'Titan One', ui-sans-serif, system-ui, sans-serif;
+     Snap ITC was named ahead of it, which made the caption render in two
+     different faces: Snap ITC on a Windows machine that has Office, Titan One
+     on every phone, where Snap ITC does not exist and cannot be downloaded
+     (it ships with Office, not Google Fonts, and its licence does not cover
+     web embedding). Naming any locally-installed font here splits the page
+     that way, so the stack holds one downloadable face that everybody gets. */
+  --font-caption: 'Titan One', ui-sans-serif, system-ui, sans-serif;
 }
 
 /* --------------------------------------------------------------------------
