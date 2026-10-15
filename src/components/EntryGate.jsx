@@ -65,15 +65,18 @@ export default function EntryGate({ onOpen }) {
 
         <h1 id="entry-names" className="name-display mt-5 text-[2.6rem] leading-tight text-ink">
           {couple.groom.full}
+          {couple.groom.zh && <span className="zh mt-1 block text-[1.3rem]">{couple.groom.zh}</span>}
           <span aria-hidden="true" className="text-seal text-[1.6rem] my-1 block text-[0.55rem]">
             ♥
           </span>
           {couple.bride.full}
+          {couple.bride.zh && <span className="zh mt-1 block text-[1.3rem]">{couple.bride.zh}</span>}
         </h1>
 
         <p className="ticket-data mt-5 text-[0.8rem] leading-relaxed text-rail">
           We wish to invite you
         </p>
+        <p className="zh mt-0.5 text-[0.95rem] text-rail">诚意邀请</p>
 
         {/* The stub, torn along the same perforation as the RSVP ticket. */}
         <div className="perforation mt-7 pt-6">
@@ -81,12 +84,17 @@ export default function EntryGate({ onOpen }) {
             type="button"
             autoFocus
             onClick={open}
-            className="flex w-full items-center justify-center gap-2.5 bg-ink px-5 py-4 text-[0.95rem] font-medium text-paper transition-colors hover:bg-kopi"
+            className="gate-button flex w-full items-center justify-center gap-2.5 bg-ink px-5 py-4 text-[1.05rem] font-semibold text-paper transition-colors hover:bg-kopi"
           >
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" className="size-3.5">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" className="size-3.5 text-ochre">
               <path d="M6.5 3.6l14 8.4-14 8.4z" />
             </svg>
-            Open invitation
+            {/* Each language holds together, so a narrow phone drops the
+                Chinese to its own line rather than splitting the English. */}
+            <span>
+              <span className="whitespace-nowrap">Open invitation</span>{' '}
+              <span className="zh whitespace-nowrap">点击进入</span>
+            </span>
           </button>
         </div>
       </div>

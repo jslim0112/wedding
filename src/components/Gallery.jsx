@@ -27,6 +27,11 @@ function Chevron({ back = false }) {
   )
 }
 
+/* The viewer's arrows sit on a near-black backdrop, so they invert the
+   carousel's: paper-coloured glass rather than paper-coloured card. */
+const VIEWER_ARROW =
+  'absolute top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-paper/30 bg-paper/10 text-paper transition-colors hover:bg-paper/25 sm:size-12'
+
 const ARROW =
   'pointer-events-auto flex size-9 items-center justify-center rounded-full border border-rail/30 bg-paper/85 text-kopi shadow-sm transition-colors hover:bg-paper hover:text-ink sm:size-10'
 
@@ -54,6 +59,7 @@ export default function Gallery() {
   const triggersRef = useRef([])
   const dialogRef = useRef(null)
   const settleRef = useRef(0)
+  const swipeRef = useRef(null)
   // Where the strip is heading. `index` only catches up once a scroll event
   // lands, so stepping off it would make two quick presses of Next aim at the
   // same photo twice; this is updated the moment a press is handled.
@@ -155,6 +161,46 @@ export default function Gallery() {
     })
   }, [viewable])
 
+  /** Move the viewer one photo either way, wrapping at both ends. */
+  const stepViewer = useCallback(
+    (delta) => {
+      setOpenAt((i) => (i === null ? i : (i + delta + viewable.length) % viewable.length))
+    },
+    [viewable.length],
+  )
+
+  /* A swipe across the viewer moves to the next photo. Pointer events cover
+     touch and a mouse drag in one path, and only the primary pointer counts,
+     so a pinch to zoom into a photo is never read as a swipe. */
+  const onPointerDown = (event) => {
+    if (!event.isPrimary) return
+    swipeRef.current = { x: event.clientX, y: event.clientY, swiped: false }
+  }
+
+  const onPointerUp = (event) => {
+    const start = swipeRef.current
+    if (!start || !event.isPrimary) return
+
+    const dx = event.clientX - start.x
+    const dy = event.clientY - start.y
+
+    // Horizontal, and far enough to be deliberate rather than a sloppy tap.
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
+      start.swiped = true
+      stepViewer(dx < 0 ? 1 : -1)
+    }
+  }
+
+  /* Tapping the backdrop closes — but a swipe ends in a click too, and that
+     click would otherwise shut the viewer the instant it changed photo. */
+  const onBackdropClick = () => {
+    if (swipeRef.current?.swiped) {
+      swipeRef.current = null
+      return
+    }
+    close()
+  }
+
   useEffect(() => {
     if (openAt === null) return
 
@@ -162,9 +208,9 @@ export default function Gallery() {
       if (event.key === 'Escape') {
         close()
       } else if (event.key === 'ArrowRight') {
-        setOpenAt((i) => (i + 1) % viewable.length)
+        stepViewer(1)
       } else if (event.key === 'ArrowLeft') {
-        setOpenAt((i) => (i - 1 + viewable.length) % viewable.length)
+        stepViewer(-1)
       }
     }
 
@@ -247,9 +293,15 @@ export default function Gallery() {
                         {/* whitespace-pre-line honours a \n written into a
                             caption in config.js — that is what puts the year
                             on its own line — while still collapsing ordinary
-                            runs of spaces and wrapping long lines normally. */}
+                            runs of spaces and wrapping long lines normally.
+
+                            Sizes read upwards: the bare one is the phone's and
+                            sm: takes over from 640px. The breakpoint is a
+                            prefix, never a suffix — `text-sm-[3rem]` is not a
+                            class Tailwind knows, and silently compiles to
+                            nothing at all. */}
                         {photo.caption && (
-                          <p className="font-caption text-[1.8rem] leading-snug whitespace-pre-line text-ink">
+                          <p className="font-caption text-[2rem] leading-snug whitespace-pre-line text-ink sm:text-[3rem]">
                             {photo.caption}
                           </p>
                         )}
@@ -323,8 +375,19 @@ export default function Gallery() {
           aria-modal="true"
           aria-label={current.alt || current.caption || `Photo ${openAt + 1} of ${viewable.length}`}
           tabIndex={-1}
-          onClick={close}
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-ink/95 p-4"
+          onClick={onBackdropClick}
+          onPointerDown={onPointerDown}
+          onPointerUp={onPointerUp}
+          onPointerCancel={() => {
+            swipeRef.current = null
+          }}
+          /* touch-action decides who owns a horizontal drag. Left at the
+             default the browser treats it as a possible pan, claims the
+             gesture and fires pointercancel instead of pointerup — so the
+             swipe below never completes. Claiming the horizontal axis here
+             hands it back, while pan-y and pinch-zoom keep a two-finger zoom
+             into a photo working. */
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-ink/95 p-4 select-none [touch-action:pan-y_pinch-zoom]"
         >
           <img
             src={current.src}
@@ -350,6 +413,37 @@ export default function Gallery() {
                 <p className="zh mt-0.5 text-[0.9rem] text-paper/70">{current.caption_zh}</p>
               )}
             </div>
+          )}
+
+          {/* The same two arrows as the carousel, in the viewer's own colours.
+              They stop the click from reaching the backdrop, which would
+              otherwise close the viewer on the way past. */}
+          {viewable.length > 1 && (
+            <>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  stepViewer(-1)
+                }}
+                aria-label="Previous photo"
+                className={`${VIEWER_ARROW} left-3 sm:left-5`}
+              >
+                <Chevron back />
+              </button>
+
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  stepViewer(1)
+                }}
+                aria-label="Next photo"
+                className={`${VIEWER_ARROW} right-3 sm:right-5`}
+              >
+                <Chevron />
+              </button>
+            </>
           )}
 
           <button

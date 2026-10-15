@@ -11,7 +11,7 @@ function weddingEvent() {
   const { wedding, venue, couple, site } = config
   return {
     title: `${couple.groom.first} & ${couple.bride.first}’s Wedding`,
-    description: `We're getting married at ${venue.name}, ${wedding.city}. ${site.url}`,
+    description: `See you soon! ${site.url}`,
     location: `${venue.name}, ${venue.address}`,
     startISO: wedding.startISO,
     endISO: wedding.endISO,
