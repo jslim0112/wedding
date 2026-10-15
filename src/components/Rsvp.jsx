@@ -311,11 +311,11 @@ export default function Rsvp() {
         ? { en: 'Sending…', zh: '送出中…' }
         : { en: 'Reserving…', zh: '预留中…' }
       : form.attending === false
-        ? { en: 'Send your reply', zh: '送出回复' }
-        : { en: 'Reserve your seats', zh: '预留位子' }
+        ? { en: 'Submit', zh: '提交' }
+        : { en: 'Submit', zh: '提交' }
 
   return (
-    <Section id="rsvp" title="Reserve" title_zh="预留位子">
+    <Section id="rsvp" title="Reserve" title_zh="出席回复">
       <Reveal>
         <p className="mb-6 text-[1rem] leading-relaxed text-kopi">
           Kindly reply by{' '}
@@ -339,14 +339,13 @@ export default function Rsvp() {
             <div className="flex items-baseline justify-between border-b border-rail/60 pb-4">
               <span className="ticket-data text-[0.6rem] text-rail">
                 Wedding Ticket
-                <span className="zh ml-1.5 normal-case">喜宴入场券</span>
               </span>
               <span className="ticket-data text-[0.6rem] text-rail">{wedding.dateNumeric}</span>
             </div>
 
             <Field
               id="fullName"
-              label="Full name"
+              label="Name"
               label_zh="姓名"
               required
               error={errors.fullName}
@@ -386,7 +385,7 @@ export default function Rsvp() {
             </Field>
 
             <fieldset>
-              <legend className="ticket-data text-[0.66rem] text-kopi">
+              <legend className="ticket-data text-[0.8rem] text-kopi">
                 Can you make it?
                 <span className="zh ml-1.5 normal-case">能出席吗？</span>
                 <span aria-hidden="true" className="text-ochre"> *</span>
@@ -528,7 +527,7 @@ export default function Rsvp() {
                 className="w-full bg-ink px-5 py-4 text-[1rem] font-medium text-paper transition-colors hover:bg-kopi disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {submitLabel.en}
-                <span className="zh mt-0.5 block text-[0.85rem]">{submitLabel.zh}</span>
+                <span className="zh mt-0.5 text-[1rem]"> {submitLabel.zh}</span>
               </button>
 
               {submitError && (

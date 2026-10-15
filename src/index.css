@@ -29,15 +29,18 @@
   /* Ticket data is Open Sans too - the pairing is two families, so printed
      labels get their character from letterspaced small caps, not a third face. */
   --font-ticket: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
-  /* Gallery captions. Titan One and nothing else on purpose.
+  /* Gallery captions.
 
-     Snap ITC was named ahead of it, which made the caption render in two
-     different faces: Snap ITC on a Windows machine that has Office, Titan One
-     on every phone, where Snap ITC does not exist and cannot be downloaded
-     (it ships with Office, not Google Fonts, and its licence does not cover
-     web embedding). Naming any locally-installed font here splits the page
-     that way, so the stack holds one downloadable face that everybody gets. */
-  --font-caption: 'Titan One', ui-sans-serif, system-ui, sans-serif;
+     Changing this name alone does nothing: the family also has to be
+     requested in the Google Fonts link in index.html, or the browser has no
+     file to paint with and the caption drops silently to the next entry in
+     the stack. Change it in both places, or not at all.
+
+     One downloadable face and no locally-installed one, on purpose. Naming a
+     font that only some machines own - Snap ITC, say, which ships with Office
+     - splits the page: that face on a Windows desktop, the fallback on every
+     phone, which is not a choice anyone made deliberately. */
+  --font-caption: 'Freckle Face', ui-sans-serif, system-ui, sans-serif;
 }
 
 /* --------------------------------------------------------------------------
@@ -178,6 +181,64 @@ body {
 }
 
 /* --------------------------------------------------------------------------
+   The "Open invitation" button. It is the one thing on the entry screen a
+   guest has to do, so it keeps calling for the tap: it beats like a heart,
+   throwing out an ochre halo each time, and a glint of light runs across it
+   now and then. Its colours are Tailwind classes on the button itself - ink,
+   the same as the screen behind the card.
+
+   overflow: hidden clips the glint to the button but not the halo - an
+   element's own box-shadow is never clipped by its own overflow.
+-------------------------------------------------------------------------- */
+@keyframes gate-beat {
+  0% {
+    transform: scale(1);
+    box-shadow:
+      0 4px 14px color-mix(in srgb, var(--color-ink) 35%, transparent),
+      0 0 0 0 color-mix(in srgb, var(--color-ochre) 90%, transparent);
+  }
+  14% {
+    transform: scale(1.05);
+  }
+  30% {
+    transform: scale(1);
+  }
+  75%,
+  100% {
+    transform: scale(1);
+    box-shadow:
+      0 4px 14px color-mix(in srgb, var(--color-ink) 35%, transparent),
+      0 0 16px 18px color-mix(in srgb, var(--color-ochre) 0%, transparent);
+  }
+}
+
+@keyframes gate-shine {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  45%,
+  100% {
+    transform: translateX(300%) skewX(-20deg);
+  }
+}
+
+.gate-button {
+  position: relative;
+  overflow: hidden;
+  animation: gate-beat 1.6s ease-out infinite;
+}
+
+.gate-button::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.22), transparent);
+  pointer-events: none;
+  animation: gate-shine 3.2s ease-in-out infinite;
+}
+
+/* --------------------------------------------------------------------------
    The music player's three little bars. Only ever animate while the song is
    actually playing — the component swaps the class out when it is paused, so
    nothing is running in the background of a silent page.
@@ -214,6 +275,64 @@ body {
 }
 
 /* --------------------------------------------------------------------------
+   The agenda's trail. The first time the card is revealed the dashed trail
+   draws itself down it, top to bottom; each stop fades in as the trail
+   arrives, and its heart pops onto the trail a beat later. Once they are all
+   down, the hearts start to beat, one after another down the trail. The
+   drawing time and each stop's --stop-delay and --beat-delay are set inline
+   by the component, which is the one place that knows how many stops there
+   are.
+-------------------------------------------------------------------------- */
+@keyframes heart-beat {
+  0%,
+  45%,
+  100% {
+    scale: 1;
+  }
+  12% {
+    scale: 1.2;
+  }
+  24% {
+    scale: 1;
+  }
+  33% {
+    scale: 1.12;
+  }
+}
+
+.trail {
+  clip-path: inset(0 0 100% 0);
+  transition-property: clip-path;
+  transition-timing-function: linear;
+}
+
+.trail-stop {
+  opacity: 0;
+  transition: opacity 500ms ease-out var(--stop-delay, 0ms);
+}
+
+/* A little overshoot, so the heart lands with a bounce rather than a fade. */
+.trail-heart {
+  transform: scale(0.2);
+  transition: transform 600ms cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--stop-delay, 0ms) + 150ms);
+}
+
+.reveal-visible .trail {
+  clip-path: inset(0);
+}
+
+.reveal-visible .trail-stop {
+  opacity: 1;
+}
+
+/* The beat is on `scale` and the pop on `transform`, so neither ever
+   overrides the other. Lub, dub, rest. */
+.reveal-visible .trail-heart {
+  transform: none;
+  animation: heart-beat 1.3s ease-in-out var(--beat-delay, 0ms) infinite;
+}
+
+/* --------------------------------------------------------------------------
    prefers-reduced-motion: no rotation, no travel, no smooth scroll.
 -------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
@@ -235,6 +354,36 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  /* The gate button keeps its emphasis without anything moving: the beat
+     becomes a still double ring. */
+  .gate-button {
+    animation: none !important;
+    box-shadow:
+      0 4px 14px color-mix(in srgb, var(--color-ink) 35%, transparent),
+      0 0 0 3px var(--color-card),
+      0 0 0 5px var(--color-ochre);
+  }
+
+  .gate-button::after {
+    display: none;
+  }
+
+  /* The trail is simply there, with every stop and heart on it, and the
+     hearts hold still. The delays would otherwise still hold each stop back
+     before it snapped in. */
+  .trail,
+  .trail-stop,
+  .trail-heart {
+    clip-path: none;
+    opacity: 1;
+    transform: none;
+    transition: none !important;
+  }
+
+  .trail-heart {
+    animation: none !important;
   }
 
   /* The bars hold still rather than snapping to a frozen tall state. */
