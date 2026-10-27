@@ -14,15 +14,28 @@ export default function Hero() {
 
   return (
     <header className="relative isolate flex min-h-svh flex-col justify-between overflow-hidden bg-ink text-paper">
-      {/* Photo, with a flat ink wash over it so the type always has contrast. */}
-      <div className="absolute inset-0 -z-10">
+      {/* Photo, with a flat ink wash over it so the type always has contrast.
+
+          The photo keeps its own shape: full height, as wide as that makes
+          it, centred. On a phone that is wider than the screen and the sides
+          are cropped, just as object-cover would; on a desktop it is
+          narrower, so it stands in the middle with ink either side rather
+          than being blown up and cropped to a letterbox. shrink-0 and
+          max-w-none stop flex and the base image styles squeezing it back to
+          the screen's width, which would distort it instead.
+
+          From tablet width up its left and right edges fade into the ink, so
+          the sides read as space rather than as the edge of a frame. Phones
+          never see the fade: there it falls off-screen with the cropped
+          sides. */}
+      <div className="absolute inset-0 -z-10 flex justify-center">
         {hero.photo.src ? (
           <>
             <img
               src={hero.photo.src}
               alt={hero.photo.alt}
               fetchPriority="high"
-              className="size-full object-cover"
+              className="h-full w-auto max-w-none shrink-0 md:[mask-image:linear-gradient(to_right,transparent,black_15%,black_85%,transparent)]"
             />
             <div className="absolute inset-0 bg-ink/70" />
           </>
@@ -43,10 +56,10 @@ export default function Hero() {
       </div>
 
       {/* Names */}
-      <div className="mx-auto w-full max-w-[680px] px-6 py-10 text-center mb-0">
-        <p className="ticket-data mb-8 text-[1.2rem] text-paper/60"><b>You are invited</b></p>
+      <div className="mx-auto w-full max-w-[680px] px-6 pb-10 pt-8 text-center mb-0">
+        <p className="ticket-data text-[1.3rem] text-paper/60"><b>You are invited</b></p>
 
-        <h1 className="name-display text-[3.4rem] text-paper sm:text-[5.5rem]">
+        <h1 className="name-display text-[3.4rem] mt-28 text-paper sm:text-[5.5rem]">
           <Name person={couple.groom} />
           {/* Inline SVG rather than the ❤️ emoji: every OS draws its own emoji,
               so this keeps one shape and one red across all of them. */}
@@ -57,7 +70,7 @@ export default function Hero() {
             className="mx-auto my-4 block size-6 text-seal sm:size-9"
           >
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-          </svg>
+          </svg>  
           <span className="sr-only">and</span>
           <Name person={couple.bride} />
         </h1>

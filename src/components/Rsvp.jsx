@@ -202,34 +202,25 @@ export default function Rsvp() {
           <div
             ref={confirmationRef}
             tabIndex={-1}
-            className="relative overflow-hidden px-6 pt-12 pb-44 text-center sm:px-8 sm:pt-14"
+            className="relative overflow-hidden px-6 pt-5 pb-40 text-center sm:px-8 sm:pt-14"
           >
-            <p className="heading-display text-[2.5rem] text-rail">
-              {couple.groom.first}{' '}
-              <br/>
-              <span aria-hidden="true" className="text-seal text-[1.6rem]">
-                ♥
-              </span>
-              <br/>
-              <span className="sr-only">and</span> {couple.bride.first}
-            </p>
-            <p className="ticket-data mt-3 text-[2.0rem] text-ink">Thank you</p>
-            <p className="zh text-[1.4rem] leading-tight text-ink">谢谢您</p>
+            <p className="ticket-data mt-0 text-[2.0rem] text-ink">Thank you</p>
+            <p className="zh text-[1.4rem] leading-tight text-ink">谢谢！</p>
             <p className="mx-auto mt-3 max-w-sm text-[1.0rem] leading-relaxed text-kopi">
               {attending
                 ? `See you on ${wedding.dateNumeric}, ${wedding.dayLabel} ${wedding.timeStart} at ${wedding.city}`
                 : `We will miss you! Thanks for getting us know.`}
               <span className="zh mt-1 block">
                 {attending
-                  ? `${wedding.dateNumeric}（${wedding.dayLabel_zh}）${wedding.timeStart}，${wedding.city_zh}见`
+                  ? `${wedding.dateNumeric}（${wedding.dayLabel_zh}）${wedding.timeStart}，我们${wedding.city_zh}见`
                   : '我们会想念您！谢谢您的回复。'}
               </span>
             </p>
 
             {attending && (
               <p className="mt-4 border-t border-rail/40 pt-4 mx-auto max-w-[16rem]">
-                <span className="ticket-data text-[0.62rem] text-rail">Seats reserved</span>
-                <span className="ticket-data mt-1 block text-[1rem] text-ink">{seatsEn}</span>
+                <span className="ticket-data text-[0.8rem] text-rail">Seats reserved</span>
+                <span className="ticket-data mt-1 block text-[1.0rem] text-ink">{seatsEn}</span>
                 <span className="zh block text-[0.9rem] text-kopi">{seatsZh}</span>
               </p>
             )}
@@ -262,7 +253,7 @@ export default function Rsvp() {
             stays the last thing on the ticket. */}
         {attending && (
           <div className="mt-8">
-            <p className="ticket-data text-center text-[0.66rem] text-rail">
+            <p className="ticket-data text-center text-[0.8rem] text-rail">
               Keep the date
               <span className="zh ml-1.5 normal-case">记下这个日子</span>
             </p>
@@ -322,8 +313,7 @@ export default function Rsvp() {
           <span className="font-ticket text-ink">{rsvp.deadlineLabel}</span> so we can get the seating
           right.
           <span className="zh mt-1 block">
-            请于 <span className="font-ticket text-ink">{rsvp.deadlineLabel}</span> 之前回复，
-            以便我们安排座位。
+            请于 <span className="font-ticket text-ink">{rsvp.deadlineLabel}</span> 回复, 以便于我们安排。
           </span>
         </p>
 
