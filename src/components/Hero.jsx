@@ -1,4 +1,5 @@
 import { config } from '../config'
+import HeroLanterns from './ui/HeroLanterns'
 
 function Name({ person }) {
   return (
@@ -47,6 +48,8 @@ export default function Hero() {
           </div>
         )}
       </div>
+
+      <HeroLanterns />
 
       {/* Ticket header strip */}
       <div className="mx-auto w-full max-w-[680px] px-6 pt-6">

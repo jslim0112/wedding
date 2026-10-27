@@ -13,3 +13,14 @@ export function musicSrc() {
   const { music } = config
   return music.src || publicUrl(music.bucket, music.path)
 }
+
+/**
+ * Whether the "Open invitation" screen is shown. Nothing to gate if there is
+ * no song: the tap would buy nothing, so the guest goes straight to the page.
+ *
+ * The balloon layer asks too. Its opening bouquet goes up on that tap, so with
+ * no screen to tap it sends the bouquet up by itself instead.
+ */
+export function entryGateEnabled() {
+  return config.music.entryScreen && Boolean(musicSrc())
+}

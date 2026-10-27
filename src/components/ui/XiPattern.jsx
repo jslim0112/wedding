@@ -20,8 +20,12 @@ const XI_SCALE = XI_SIZE / 24
 /* Geometric, paper-cut style: two 喜 side by side, with the long strokes
    running straight through both as they do when the character is cut from
    one sheet of red paper. Drawn rather than set in a font, so it looks the
-   same on every phone. */
-const XI = (
+   same on every phone.
+
+   Exported for the other things that carry a 囍 - the balloons, the hero
+   lanterns, the margin doodles. Bare paths with no paint of their own: the
+   group they are dropped into sets the stroke. */
+export const XI = (
   <>
     <path d="M1 2H23M6 0.6V5.4M18 0.6V5.4M3 5.4H9M15 5.4H21" />
     <path d="M3.6 7.6h4.8v3.6H3.6zM15.6 7.6h4.8v3.6h-4.8z" />

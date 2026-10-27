@@ -125,6 +125,7 @@ A few worth knowing:
 | Displayed date text | `wedding.dateLong`, `dateShort`, `timeLabel` | Change these too — they are not generated from the ISO date. |
 | Dress code | `venue.dressCode` | Currently empty, so that row is hidden. Type something and the row appears. |
 | RSVP deadline | `rsvp.deadlineLabel` | Shown above the form. |
+| Decorations | `decorations` | Balloons, hero lanterns, plum blossom, section dividers, the RSVP celebration and the desktop margin doodles — each one switches off on its own with `false`. Everything that moves stays still (or isn't drawn) for guests whose phone asks for reduced motion. |
 | Max seats per reply | `rsvp.maxPax` | The cap on adults + children together. The database enforces the same ceiling — raise it here and in `supabase/schema.sql` together, or the form will accept a party the table then refuses. |
 
 ---
@@ -321,7 +322,8 @@ tools/                   og-image template; not part of the site
 Design notes, if you ever hand this to someone else. The structure is still a ticket — a
 perforated stub, notches, a stamp on submit — but the palette is wine and blush on warm
 ivory rather than the railway colours it started from. All seven colours are `@theme` tokens
-at the top of `src/index.css`; change one there and it changes everywhere.
+at the top of `src/index.css`; change one there and it changes everywhere. Two more tokens,
+`blush` and `gilt`, are for the decorations only and never for text.
 
 Two typefaces. **Alex Brush** for names and section headings only, and **Open Sans** for
 everything else including the letterspaced uppercase labels. Two things to respect if you
