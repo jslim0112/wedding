@@ -116,7 +116,7 @@ export const config = {
 
   hero: {
     // TODO: paste the Supabase Storage public URL for the main photo.
-    photo: { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/JMqCOdagbM.png?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC9KTXFDT2RhZ2JNLnBuZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3OTMxMDU1MjYsImV4cCI6MTgyNDY0MTUyNn0.4ifQhMX8P9V1xHLDA6Ny8YIL8wNnRI-vTWu0r_DA41Q', alt: 'Jason and Mei Yean', slot: 'Hero photo — the two of you, landscape' },
+    photo: { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2026_background.png?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI2X2JhY2tncm91bmQucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc5MzExNTUxNywiZXhwIjoxODI0NjUxNTE3fQ.r6E5DjADKXRNgVpw4Ory5l7lOOdc6QRiqrp-uLDXecE', alt: 'Jason and Mei Yean', slot: 'Hero photo — the two of you, landscape' },
   },
 
   story: {
@@ -195,6 +195,33 @@ export const config = {
     // for everyone instead of only for guests who happen to tap.
     // Set to false to open straight onto the page.
     entryScreen: true,
+  },
+
+  /* The ornaments around the page. Each one switches off on its own — set it
+     to false and it is simply not drawn. Anything that moves also holds still
+     (or stays away) for a guest whose phone asks for reduced motion. */
+  decorations: {
+    // A bouquet of balloons goes up as the invitation opens, then a stray one
+    // drifts up now and then, along the edges on a phone and in the side
+    // margins on a wide screen. A tap pops one; they pop by themselves near
+    // the top.
+    balloons: true,
+    // Roughly how often a stray balloon goes up after the bouquet, in seconds.
+    // Never more than three strays are in the air at once.
+    balloonEverySeconds: 3,
+    // Two 囍 lanterns and a string of fairy lights across the top of the hero.
+    lanterns: true,
+    // Plum blossom on the calendar card, and petals drifting down the
+    // countdown section.
+    blossoms: true,
+    // The small line–diamond–heart rule between sections.
+    dividers: true,
+    // Confetti and a few balloons when a guest says they are coming, and
+    // again whenever they tap the stamp. A "can't make it" reply stays quiet.
+    rsvpCelebration: true,
+    // Faint line drawings in the empty margins either side of the page. Wide
+    // screens only — a phone has no margins to fill.
+    margins: true,
   },
 
   footer: {

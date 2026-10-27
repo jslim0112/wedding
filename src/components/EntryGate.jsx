@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { config } from '../config'
-import { musicSrc } from '../lib/music'
+import { entryGateEnabled } from '../lib/music'
 
 /* ---------------------------------------------------------------------------
    The front door — a ticket held up over the page until the guest opens it.
@@ -23,12 +23,12 @@ import { musicSrc } from '../lib/music'
 const FADE_OUT_MS = 500
 
 export default function EntryGate({ onOpen }) {
-  const { couple, wedding, music } = config
+  const { couple, wedding } = config
   const [phase, setPhase] = useState('shown') // shown -> leaving -> gone
+  const opened = useRef(false)
 
-  // Nothing to gate if there is no song: the tap would buy nothing, so the
-  // guest goes straight to the page.
-  const enabled = music.entryScreen && Boolean(musicSrc())
+  // Nothing to gate if there is no song - see entryGateEnabled.
+  const enabled = entryGateEnabled()
 
   // Hold the page still underneath. Restores whatever was there before, so
   // this cannot fight with anything else that touches overflow later.
@@ -44,7 +44,11 @@ export default function EntryGate({ onOpen }) {
   if (!enabled || phase === 'gone') return null
 
   const open = () => {
-    if (phase !== 'shown') return
+    // A tap on the button reaches the backdrop's handler too, in the same
+    // event and before any re-render - so `phase` still reads 'shown' the
+    // second time. The ref changes at once, so the invitation opens once.
+    if (opened.current) return
+    opened.current = true
     onOpen?.() // First. The gesture is still live only right here.
     setPhase('leaving')
     setTimeout(() => setPhase('gone'), FADE_OUT_MS)

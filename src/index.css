@@ -23,6 +23,12 @@
   --color-rail: #8e6f77;
   --color-ochre: #d9a441;
   --color-seal: #a63d40;
+  /* Decoration only — balloons, plum blossom, petals, confetti. Never for
+     text: it sits at almost the page's own lightness and would vanish. */
+  --color-blush: #eabfc1;
+  /* Ochre lifted towards gold leaf, for the 囍 printed on a red balloon or
+     lantern. Plain ochre goes muddy against the seal red. */
+  --color-gilt: #ecc46a;
 
   --font-display: 'Alex Brush', 'Noto Serif SC', cursive;
   --font-body: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
@@ -333,6 +339,387 @@ body {
 }
 
 /* --------------------------------------------------------------------------
+   Decorations. All ornament: none of it carries information, all of it is
+   aria-hidden, and each piece switches off on its own under `decorations` in
+   config.js. Whatever moves is stilled or removed under prefers-reduced-motion
+   at the bottom of this file.
+-------------------------------------------------------------------------- */
+
+/* Balloons. Each one rises from below the screen to a height its component
+   picks (--rise), drifting a little sideways (--drift) and slowing as it nears
+   the top, and sways on its string the whole way up. When the rise ends - or
+   when a guest taps it first - it pops: the skin swells and vanishes, the
+   string drops away, and a ring and a scatter of hearts and paper fly out. */
+@keyframes balloon-rise {
+  from {
+    transform: translate(0, 100%);
+  }
+  to {
+    transform: translate(var(--drift, 0px), var(--rise, -80vh));
+  }
+}
+
+@keyframes balloon-sway {
+  from {
+    transform: rotate(-5deg) translateX(-3px);
+  }
+  to {
+    transform: rotate(5deg) translateX(3px);
+  }
+}
+
+@keyframes balloon-skin-pop {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  45% {
+    transform: scale(1.16);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes balloon-string-drop {
+  to {
+    transform: translateY(46px) rotate(14deg);
+    opacity: 0;
+  }
+}
+
+@keyframes balloon-ring {
+  from {
+    transform: scale(0.4);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@keyframes balloon-bit {
+  0% {
+    transform: translateY(-6px) scale(0.5) rotate(0deg);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(var(--reach, -40px)) scale(1) rotate(160deg);
+    opacity: 0;
+  }
+}
+
+.balloon {
+  position: absolute;
+  bottom: 0;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  animation: balloon-rise 10s cubic-bezier(0.33, 0.08, 0.5, 1) both;
+  will-change: transform;
+}
+
+.balloon-sway {
+  display: block;
+  transform-origin: 50% 100%;
+  animation: balloon-sway 3s ease-in-out infinite alternate;
+}
+
+.balloon-skin,
+.balloon-string {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.balloon-body {
+  fill: currentColor;
+  stroke: color-mix(in srgb, var(--color-ink) 20%, transparent);
+  stroke-width: 0.8;
+}
+
+.balloon-shade {
+  fill: color-mix(in srgb, var(--color-ink) 22%, transparent);
+}
+
+.balloon-shine {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.6);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+}
+
+.balloon-xi {
+  fill: none;
+  stroke: var(--color-gilt);
+  stroke-width: 1.9;
+  stroke-linecap: square;
+}
+
+.balloon-string path {
+  fill: none;
+  stroke: color-mix(in srgb, var(--color-rail) 75%, transparent);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+
+/* Popped: frozen where it was, so the burst happens on the spot. */
+.balloon-popped {
+  pointer-events: none;
+  animation-play-state: paused;
+}
+
+.balloon-popped .balloon-sway {
+  animation-play-state: paused;
+}
+
+.balloon-popped .balloon-skin {
+  animation: balloon-skin-pop 180ms ease-out forwards;
+}
+
+.balloon-popped .balloon-string {
+  animation: balloon-string-drop 700ms ease-in forwards;
+}
+
+/* The burst is centred on the skin, which is the top 70 of the 114 units. */
+.balloon-burst {
+  position: absolute;
+  left: 50%;
+  top: 31%;
+}
+
+.balloon-ring {
+  position: absolute;
+  left: -14px;
+  top: -14px;
+  width: 28px;
+  height: 28px;
+  border: 2px solid currentColor;
+  border-radius: 9999px;
+  animation: balloon-ring 420ms ease-out forwards;
+}
+
+.balloon-ray {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.balloon-bit {
+  position: absolute;
+  display: block;
+  left: -3px;
+  top: -3px;
+  width: 6px;
+  height: 6px;
+  animation: balloon-bit 760ms cubic-bezier(0.12, 0.7, 0.3, 1) forwards;
+}
+
+.balloon-ray:nth-child(odd) .balloon-bit {
+  --reach: -58px;
+}
+
+.balloon-bit-dot {
+  border-radius: 9999px;
+}
+
+.balloon-bit-strip {
+  left: -1.5px;
+  width: 3px;
+  height: 9px;
+}
+
+.balloon-bit-heart {
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+}
+
+/* Lanterns. Each swings from the top of its cord like a pendulum, and the
+   glow behind it breathes. The two are out of step so they never swing as a
+   pair. */
+@keyframes lantern-swing {
+  from {
+    rotate: -3.5deg;
+  }
+  to {
+    rotate: 3.5deg;
+  }
+}
+
+@keyframes lantern-glow {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fairy-twinkle {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.lantern {
+  transform-origin: 50% 0;
+  animation: lantern-swing 4.2s ease-in-out infinite alternate;
+}
+
+.lantern-glow {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  width: 130px;
+  height: 130px;
+  margin: -65px 0 0 -65px;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--color-gilt) 36%, transparent) 0%,
+    transparent 65%
+  );
+  animation: lantern-glow 2.8s ease-in-out infinite alternate;
+}
+
+.fairy-bulb {
+  box-shadow: 0 0 6px 1px color-mix(in srgb, var(--color-gilt) 90%, transparent);
+  animation: fairy-twinkle 2.2s ease-in-out infinite alternate;
+}
+
+/* Plum petals. The outer layer is the full height of its section, so
+   translateY(100%) carries the petal exactly from the top edge to the bottom
+   whatever the section measures; the petal itself flutters side to side. */
+@keyframes petal-fall {
+  from {
+    transform: translateY(-24px);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes petal-flutter {
+  from {
+    transform: translateX(-14px) rotate(-40deg);
+  }
+  to {
+    transform: translateX(14px) rotate(120deg);
+  }
+}
+
+.petal-fall {
+  animation: petal-fall 15s linear infinite;
+}
+
+.petal-flutter {
+  animation: petal-flutter 2.6s ease-in-out infinite alternate;
+}
+
+/* RSVP confetti, thrown up and out from the stamp. Each piece flies along its
+   own angle (the bit) while the whole piece falls under gravity (the outer
+   layer), which is what bends the paths into arcs. */
+@keyframes confetti-gravity {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(110px);
+  }
+}
+
+@keyframes confetti-burst {
+  0% {
+    transform: translateY(0) rotate(0deg) scale(0.4);
+    opacity: 1;
+  }
+  45% {
+    transform: translateY(var(--reach, -120px)) rotate(260deg) scale(1);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(var(--reach, -120px) * 1.1)) rotate(520deg) scale(1);
+    opacity: 0;
+  }
+}
+
+.confetti-piece {
+  position: absolute;
+  left: 0;
+  top: 0;
+  animation: confetti-gravity 1600ms cubic-bezier(0.55, 0, 1, 0.45) both;
+}
+
+.confetti-bit {
+  position: absolute;
+  display: block;
+  left: -3px;
+  top: -5px;
+  width: 6px;
+  height: 10px;
+  animation: confetti-burst 1600ms cubic-bezier(0.1, 0.8, 0.25, 1) both;
+}
+
+.confetti-dot {
+  left: -3.5px;
+  top: -3.5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+}
+
+.confetti-fleck {
+  left: -2.5px;
+  top: -2.5px;
+  width: 5px;
+  height: 5px;
+}
+
+.confetti-heart {
+  left: -5.5px;
+  top: -5.5px;
+  width: 11px;
+  height: 11px;
+}
+
+/* Margin doodles bob very slightly, each on its own clock. Their strokes stay
+   one hairline weight however large each drawing is scaled. */
+@keyframes doodle-bob {
+  from {
+    translate: 0 -5px;
+  }
+  to {
+    translate: 0 5px;
+  }
+}
+
+.doodle {
+  animation: doodle-bob 7s ease-in-out infinite alternate;
+}
+
+.doodle * {
+  vector-effect: non-scaling-stroke;
+}
+
+/* --------------------------------------------------------------------------
    prefers-reduced-motion: no rotation, no travel, no smooth scroll.
 -------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
@@ -383,6 +770,20 @@ body {
   }
 
   .trail-heart {
+    animation: none !important;
+  }
+
+  /* Decorations. Balloons and confetti are never drawn at all (their
+     components check), the petals are taken away rather than frozen
+     mid-fall, and the lanterns, lights and doodles simply hang still. */
+  .petal-fall {
+    display: none;
+  }
+
+  .lantern,
+  .lantern-glow,
+  .fairy-bulb,
+  .doodle {
     animation: none !important;
   }
 

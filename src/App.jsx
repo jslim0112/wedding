@@ -9,6 +9,9 @@ import { useRef } from 'react'
 import Footer from './components/Footer'
 import MusicPlayer from './components/MusicPlayer'
 import EntryGate from './components/EntryGate'
+import Balloons from './components/Balloons'
+import MarginDoodles from './components/MarginDoodles'
+import { releaseBalloons } from './lib/balloons'
 
 export default function App() {
   // The entry screen owns the tap; the player owns the audio element. This is
@@ -28,6 +31,7 @@ export default function App() {
           aria-hidden="true"
           className="pointer-events-none absolute inset-y-0 left-1/2 hidden w-px -translate-x-[340px] bg-rail/50 lg:block"
         />
+        <MarginDoodles />
 
         <Countdown />
         <Gallery />
@@ -38,10 +42,18 @@ export default function App() {
 
       <Footer />
 
-      {/* Both are fixed to the viewport, so they sit outside the document flow
-          and render nothing until a song is set in config.js. */}
+      {/* All three are fixed to the viewport, so they sit outside the document
+          flow. The player and the gate render nothing until a song is set in
+          config.js. Opening the gate starts the song and lets the opening
+          bouquet go - the song first, while the tap is still live. */}
+      <Balloons />
       <MusicPlayer ref={music} />
-      <EntryGate onOpen={() => music.current?.start()} />
+      <EntryGate
+        onOpen={() => {
+          music.current?.start()
+          releaseBalloons()
+        }}
+      />
     </>
   )
 }

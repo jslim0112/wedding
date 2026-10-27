@@ -1,9 +1,16 @@
+import { config } from '../../config'
 import Reveal from './Reveal'
+import Divider from './Divider'
 
 /**
  * One scrolling section: a 680px document column with a station marker that
  * sits on the route line running down the left edge. The marker and the line
  * are desktop-only and deliberately quiet.
+ *
+ * Unless `divider` is false, the rule between sections sits on its top edge -
+ * exactly halfway between this section's content and the last one's, since
+ * both pad by the same amount. It belongs to the section rather than being
+ * placed between them so a section that draws nothing takes its rule with it.
  */
 export default function Section({
   id,
@@ -11,6 +18,7 @@ export default function Section({
   label_zh,
   title,
   title_zh,
+  divider = true,
   children,
   className = '',
 }) {
@@ -19,6 +27,10 @@ export default function Section({
       id={id}
       className={`relative mx-auto w-full max-w-[680px] px-6 py-16 sm:py-20 ${className}`}
     >
+      {divider && config.decorations?.dividers && (
+        <Divider className="pointer-events-none absolute inset-x-6 top-0 -translate-y-1/2" />
+      )}
+
       <span
         aria-hidden="true"
         className="pointer-events-none absolute top-[4.9rem] left-0 hidden size-[9px] -translate-x-1/2 rounded-full border border-rail bg-paper lg:block"

@@ -3,6 +3,7 @@ import { config } from '../config'
 import { getMonthMatrix, getTimeLeft } from '../lib/format'
 import Section from './ui/Section'
 import Reveal from './ui/Reveal'
+import { FallingPetals, PlumBranch, PlumSprig } from './ui/Blossom'
 
 /* The card runs Monday to Sunday, the way a Chinese wall calendar prints it. */
 const WEEKDAYS_ZH = ['一', '二', '三', '四', '五', '六', '日']
@@ -48,9 +49,14 @@ export default function Countdown() {
 
   const pad = (n) => String(n).padStart(2, '0')
   const month = getMonthMatrix(wedding.startISO)
+  const blossoms = Boolean(config.decorations?.blossoms)
+  // The sprig sits in the blank squares after the last day of the month, so
+  // it only grows when there are enough of them to hold it clear of a date.
+  const sprigRoom = month ? month.weeks[month.weeks.length - 1].filter((d) => d === null).length >= 4 : false
 
   return (
-    <Section id="countdown" label="" title="Time" title_zh="婚礼时间">
+    // First section under the hero: the dark-to-light change is its divider.
+    <Section id="countdown" label="" title="Time" title_zh="婚礼时间" divider={false}>
       <Reveal>
         {month && (
           <div className="mb-8 text-center">
@@ -67,7 +73,7 @@ export default function Countdown() {
               {/* A double rule, the way the border is printed on a wall calendar:
                   a hard outer square with a softer one set just inside it. */}
               {month && (
-                <div className="max-w-[26rem] flex-1 border border-seal/70 p-1">
+                <div className="relative max-w-[26rem] flex-1 border border-seal/70 p-1">
                   <div className="h-full rounded-[3px] border border-seal/30 px-2.5 py-4 sm:px-5">
                     <div className="flex items-baseline justify-between px-1">
                       <span className="font-ticket text-[1.1rem] font-semibold text-seal tabular-nums sm:text-[1.4rem]">
@@ -108,6 +114,16 @@ export default function Countdown() {
                       ))}
                     </div>
                   </div>
+
+                  {/* A branch reaching in over the card's top-right corner,
+                      from as far right as the screen edge on a phone, above
+                      the month and clear of the heading. */}
+                  {blossoms && (
+                    <PlumBranch className="pointer-events-none absolute -top-[52px] -right-[87px] h-16 w-[190px]" />
+                  )}
+                  {blossoms && sprigRoom && (
+                    <PlumSprig className="pointer-events-none absolute -right-[10px] -bottom-[8px] h-11 w-[130px]" />
+                  )}
                 </div>
               )}
 
@@ -127,6 +143,8 @@ export default function Countdown() {
           </>
         )}
       </Reveal>
+
+      {blossoms && <FallingPetals />}
     </Section>
   )
 }

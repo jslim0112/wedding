@@ -3,9 +3,12 @@ import { config } from '../config'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
 import { normalisePhone, isValidPhone, whatsappUrl } from '../lib/format'
 import { downloadWeddingIcs, weddingGoogleCalendarUrl } from '../lib/calendar'
+import { releaseBalloons } from '../lib/balloons'
+import { prefersReducedMotion } from '../lib/motion'
 import Section from './ui/Section'
 import Reveal from './ui/Reveal'
 import Field, { inputClass } from './ui/Field'
+import Confetti from './ui/Confetti'
 
 const EMPTY_FORM = {
   fullName: '',
@@ -21,6 +24,24 @@ const EMPTY_FORM = {
 /** Blank means none. Kept in one place so the form and the insert agree. */
 function seatCount(value) {
   return value.trim() === '' ? 0 : Number(value)
+}
+
+/** The confirmation stamp: seal red for a yes, rail grey for a no. */
+function Stamp({ attending }) {
+  return (
+    <div
+      className={`stamp mix-blend-multiply ${attending ? 'text-seal' : 'text-rail'}`}
+      aria-hidden="true"
+    >
+      <div className={`border-[3px] p-1 opacity-90 ${attending ? 'border-seal' : 'border-rail'}`}>
+        <div className={`border px-8 py-5 ${attending ? 'border-seal/60' : 'border-rail/60'}`}>
+          <p className="ticket-data text-[1.0rem] font-bold whitespace-nowrap">
+            {attending ? 'Reserved' : 'Received'}
+          </p>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default function Rsvp() {
@@ -42,6 +63,23 @@ export default function Rsvp() {
   useEffect(() => {
     if (status === 'done') confirmationRef.current?.focus()
   }, [status])
+
+  // A yes is celebrated: confetti off the stamp and a few balloons up from
+  // behind the ticket as it lands - and all of it again, stamp included, each
+  // time the guest taps the stamp. `cheers` counts the taps. A no is not
+  // celebrated, and neither is anything for a guest who asked for less motion.
+  const [cheers, setCheers] = useState(0)
+  const celebrating =
+    status === 'done' &&
+    form.attending === true &&
+    Boolean(config.decorations?.rsvpCelebration) &&
+    !prefersReducedMotion()
+
+  useEffect(() => {
+    if (!celebrating) return
+    const id = setTimeout(() => releaseBalloons(5), 350)
+    return () => clearTimeout(id)
+  }, [celebrating, cheers])
 
   // Every message is a pair - the guest reads whichever half they read.
   function validate() {
@@ -226,26 +264,29 @@ export default function Rsvp() {
             )}
 
             {/* The one bold moment. It lands in the lower band of the stub so it
-                reads as stamped onto the ticket without burying the message. */}
+                reads as stamped onto the ticket without burying the message.
+                While celebrating it is also a button: a tap stamps it down
+                again and throws another round. The key remounts it, which is
+                what replays the thunk. */}
             <div className="pointer-events-none absolute inset-x-0 bottom-15 flex justify-center">
-              <div
-                className={`stamp mix-blend-multiply ${attending ? 'text-seal' : 'text-rail'}`}
-                aria-hidden="true"
-              >
-                <div
-                  className={`border-[3px] p-1 opacity-90 ${attending ? 'border-seal' : 'border-rail'}`}
+              {celebrating ? (
+                <button
+                  type="button"
+                  onClick={() => setCheers((n) => n + 1)}
+                  className="pointer-events-auto cursor-pointer"
                 >
-                  <div
-                    className={`border px-8 py-5 ${attending ? 'border-seal/60' : 'border-rail/60'}`}
-                  >
-                    <p className="ticket-data text-[1.0rem] font-bold whitespace-nowrap">
-                      {attending ? 'Reserved' : 'Received'}
-                    </p>
-                  </div>
-                </div>
-              </div>
+                  <span className="sr-only">Celebrate again</span>
+                  <Stamp key={cheers} attending={attending} />
+                </button>
+              ) : (
+                <Stamp attending={attending} />
+              )}
             </div>
           </div>
+
+          {/* Outside the clipped stub, so the confetti can fly past its edges.
+              Centred on the stamp: 3.75rem up plus half the stamp's height. */}
+          {celebrating && <Confetti key={cheers} className="absolute bottom-[101px] left-1/2" />}
         </div>
 
         {/* Only for guests who are coming - there is nothing to save for the
