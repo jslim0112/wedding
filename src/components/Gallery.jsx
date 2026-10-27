@@ -236,7 +236,7 @@ export default function Gallery() {
   const current = openAt === null ? null : viewable[openAt]
 
   return (
-    <Section id="gallery" label="" title="A Fews of Our Favourites">
+    <Section id="gallery" label="" title="Ours" title_zh="我们">
       <Reveal>
         {/* overflow-x-clip stops the strip's width reaching the page. Even
             though the track scrolls and clips its own content, the slides
