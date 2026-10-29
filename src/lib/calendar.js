@@ -19,9 +19,25 @@ function weddingEvent() {
   }
 }
 
-/** Opened in a new tab; Google asks the guest to confirm before it saves. */
+/**
+ * What the guest is holding: 'ios' for an iPhone or iPad, 'android' for an
+ * Android phone or tablet, otherwise 'desktop' (a laptop or computer). iPadOS
+ * says it is a Mac, so a Mac that takes touch is an iPad.
+ */
+export function calendarDevice() {
+  if (typeof navigator === 'undefined') return 'desktop'
+  const ua = navigator.userAgent
+  if (/iPhone|iPad|iPod/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1)) return 'ios'
+  if (/Android/i.test(ua)) return 'android'
+  return 'desktop'
+}
+
+/**
+ * Opened in a new tab; Google asks the guest to confirm before it saves. A
+ * phone gets Google's mobile form, a computer the full page.
+ */
 export function weddingGoogleCalendarUrl() {
-  return googleCalendarUrl(weddingEvent())
+  return googleCalendarUrl(weddingEvent(), calendarDevice() !== 'desktop')
 }
 
 /**

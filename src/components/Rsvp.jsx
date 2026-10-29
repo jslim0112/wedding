@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { config } from '../config'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
 import { normalisePhone, isValidPhone, whatsappUrl } from '../lib/format'
-import { downloadWeddingIcs, weddingGoogleCalendarUrl } from '../lib/calendar'
+import { calendarDevice, downloadWeddingIcs, weddingGoogleCalendarUrl } from '../lib/calendar'
 import { releaseBalloons } from '../lib/balloons'
 import { prefersReducedMotion } from '../lib/motion'
 import Section from './ui/Section'
@@ -42,6 +42,41 @@ function Stamp({ attending }) {
       </div>
     </div>
   )
+}
+
+const PRIMARY_BUTTON =
+  'bg-ink px-5 py-3.5 text-center text-[0.95rem] font-medium text-paper transition-colors hover:bg-kopi'
+const SECONDARY_BUTTON =
+  'border border-ink px-5 py-3.5 text-center text-[0.95rem] font-medium text-ink transition-colors hover:border-ochre hover:text-kopi'
+
+/** The two save-the-date buttons, in the order that suits the guest's device. */
+function calendarButtons(device) {
+  const google = (className) => (
+    <a
+      key="google"
+      href={weddingGoogleCalendarUrl()}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={className}
+    >
+      Add to Google Calendar
+      <span className="zh mt-0.5 block text-[0.85rem]">加入 Google 日历</span>
+    </a>
+  )
+  const file = (className, label, label_zh) => (
+    <button key="file" type="button" onClick={downloadWeddingIcs} className={className}>
+      {label}
+      <span className="zh mt-0.5 block text-[0.85rem]">{label_zh}</span>
+    </button>
+  )
+
+  if (device === 'ios') {
+    return [file(PRIMARY_BUTTON, 'Add to Apple Calendar', '加入 Apple 日历'), google(SECONDARY_BUTTON)]
+  }
+  if (device === 'android') {
+    return [google(PRIMARY_BUTTON), file(SECONDARY_BUTTON, 'Add to other Calendar', '加入其他日历')]
+  }
+  return [google(PRIMARY_BUTTON), file(SECONDARY_BUTTON, 'Add to Apple Calendar', '加入 Apple 日历')]
 }
 
 export default function Rsvp() {
@@ -243,7 +278,7 @@ export default function Rsvp() {
             className="relative overflow-hidden px-6 pt-5 pb-40 text-center sm:px-8 sm:pt-14"
           >
             <p className="ticket-data mt-0 text-[2.0rem] text-ink">Thank you</p>
-            <p className="zh text-[1.4rem] leading-tight text-ink">谢谢！</p>
+            <p className="zh text-[1.4rem] leading-tight text-ink">谢谢</p>
             <p className="mx-auto mt-3 max-w-sm text-[1.0rem] leading-relaxed text-kopi">
               {attending
                 ? `See you on ${wedding.dateNumeric}, ${wedding.dayLabel} ${wedding.timeStart} at ${wedding.city}`
@@ -295,27 +330,14 @@ export default function Rsvp() {
         {attending && (
           <div className="mt-8">
             <p className="ticket-data text-center text-[0.8rem] text-rail">
-              Keep the date
+              Save the date
               <span className="zh ml-1.5 normal-case">记下这个日子</span>
             </p>
+            {/* The buttons follow the device: an iPhone or iPad leads with Apple
+                Calendar, an Android phone with Google and a plain calendar file
+                for whatever else it has, a computer with Google's full page. */}
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
-              <a
-                href={weddingGoogleCalendarUrl()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-ink px-5 py-3.5 text-center text-[0.95rem] font-medium text-paper transition-colors hover:bg-kopi"
-              >
-                Add to Google Calendar
-                <span className="zh mt-0.5 block text-[0.85rem]">加入 Google 日历</span>
-              </a>
-              <button
-                type="button"
-                onClick={downloadWeddingIcs}
-                className="border border-ink px-5 py-3.5 text-center text-[0.95rem] font-medium text-ink transition-colors hover:border-ochre hover:text-kopi"
-              >
-                Add to Apple Calendar
-                <span className="zh mt-0.5 block text-[0.85rem]">加入 Apple 日历</span>
-              </button>
+              {calendarButtons(calendarDevice())}
             </div>
           </div>
         )}

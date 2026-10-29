@@ -45,6 +45,9 @@ export const config = {
     // Slashed short form, used on the RSVP confirmation stub.
     dateNumeric: '13/03/2027',
     timeLabel: '6:30 PM — 10:00 PM',
+    // The same in Chinese, under the time on the details card. Leave it
+    // blank and that line is not shown.
+    timeLabel_zh: '晚上 6:30 至 10:00',
     // Short form for the narrow ticket-card column on a phone.
     timeCompact: '6.30 – 10 PM',
     // Just the start, for lines that only need "when to turn up".
@@ -86,7 +89,7 @@ export const config = {
     items: [
       { time: '5:00 PM', title: 'Tea ceremony', title_zh: '长辈敬茶', icon: 'tea' },
       { time: '6:30 PM', title: 'Check-in & photo session', title_zh: '签到 & 拍照留念', icon: 'camera' },
-      { time: '7:00 PM', title: 'Wedding buffet', title_zh: '自助式晚餐', icon: 'plate' },
+      { time: '7:00 PM', title: 'Wedding buffet', title_zh: '自助式晚餐', icon: 'cutlery' },
       {
         time: '8:30 PM',
         title: 'Toasts, lucky draw & fireworks',
@@ -133,15 +136,18 @@ export const config = {
     ],
   },
 
-  /* The carousel, one photo at a time. 6 to 12 photos reads best.
+  /* The gallery: a pile of polaroids, flicked through one at a time in the
+     order written here — newest first. Under the pile, each year is a station
+     on a little railway, and a train rides along it with the photos.
 
-     `caption` is the line printed under the photo, and `caption_zh` the
-     Chinese under that — write either, both, or neither. A photo with both
-     blank simply has no caption, and the one on show also carries its caption
-     into the full-screen view.
+     `caption` is written on the polaroid, and `caption_zh` under it — write
+     either, both, or neither.
 
-     A \n inside a caption breaks the line there, which is how the year below
-     sits above the event. Remove it and the caption runs on as one line.
+     Put the year on the caption's first line and the event after a \n, as in
+     'YEAR 2026\nOur ROM'. The polaroid then prints "Our ROM" with "2026"
+     beside it, and the photo's year becomes a station on the railway. A
+     caption with no year on its first line is printed whole, and that photo
+     leaves the train where the photo before it did.
      TODO: paste Supabase Storage public URLs and write the captions. */
   gallery: [
     { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2026_ROM.png?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI2X1JPTS5wbmciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzkzMTA3MzEzLCJleHAiOjE4MjQ2NDMzMTN9.d4xpW4xAMuEVSRoX6auZrZHuLGUOF8-r3z1KqEjtTHY', alt: '', slot: 'Gallery 8', caption: 'YEAR 2026\nOur ROM', caption_zh: '' },
@@ -175,7 +181,7 @@ export const config = {
   music: {
     bucket: 'wedding-photos',
     path: 'its_you_opening_cut.mp3',
-    src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/its_you_opening_cut.mp3?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV80N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC9pdHNfeW91X29wZW5pbmdfY3V0Lm1wMyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODY2MzExODUsImV4cCI6MTgxODE2NzE4NX0.5X9xRyOIg2_ANZ3hM9W-olbKkkxgbWbs0MTtr98OX7o',
+    src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/Its%20You.mp3?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC9JdHMgWW91Lm1wMyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3OTMyODUzMTcsImV4cCI6MTgyNDgyMTMxN30.s9SR9dp3B1ZJT6LXoqymWRmQESWQEOIIBg9iGcbbiQg',
     title: 'Our song',
     artist: 'Henry',
     // 0 to 1. Background music wants to sit under conversation, not over it.

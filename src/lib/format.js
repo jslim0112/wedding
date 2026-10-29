@@ -82,6 +82,11 @@ export function getTimeLeft(targetISO, now = Date.now()) {
  * Returns null for anything that is not an ISO date, so the card can simply
  * not render rather than throw.
  */
+export const MONTHS_EN = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+]
+
 export function getMonthMatrix(targetISO) {
   const parts = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(targetISO ?? ''))
   if (!parts) return null
@@ -180,7 +185,7 @@ export function buildIcs({ title, description, location, startISO, endISO, url }
  * the two stamps in UTC, joined by a slash - the same shape the .ics file uses,
  * so both readings of the day come from one source.
  */
-export function googleCalendarUrl({ title, description, location, startISO, endISO }) {
+export function googleCalendarUrl({ title, description, location, startISO, endISO }, mobile = false) {
   const params = new URLSearchParams({
     action: 'TEMPLATE',
     text: title ?? '',
@@ -188,7 +193,13 @@ export function googleCalendarUrl({ title, description, location, startISO, endI
     details: description ?? '',
     location: location ?? '',
   })
-  return `https://calendar.google.com/calendar/render?${params.toString()}`
+  // The calendar.google.com page is a website, and on a phone it opens as the
+  // desktop one. The same link on www.google.com/calendar/event is the one the
+  // Calendar app claims, so a phone with the app opens it there; without the
+  // app, Google sends the browser on to the mobile form.
+  return mobile
+    ? `https://www.google.com/calendar/event?${params.toString()}`
+    : `https://calendar.google.com/calendar/render?${params.toString()}`
 }
 
 export function downloadIcs(icsText, filename = 'wedding.ics') {
