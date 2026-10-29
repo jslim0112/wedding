@@ -21,6 +21,34 @@ export function isValidPhone(input) {
   return /^60\d{8,10}$/.test(normalisePhone(input))
 }
 
+/**
+ * A guest's name, tidied before it is checked or saved: Unicode-normalised,
+ * with control and invisible characters (zero-width spaces, bidi marks, line
+ * breaks, tabs) removed and runs of whitespace folded to one space.
+ */
+export function cleanName(input) {
+  return String(input ?? '')
+    .normalize('NFC')
+    .replace(/[\p{Cc}\p{Cf}\u2028\u2029]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+/**
+ * What a name may contain: letters from any script (Chinese included), marks,
+ * digits, spaces and . , ' ’ ( ) / - · - and it must start with a letter. That
+ * keeps out the characters that do harm somewhere downstream: < > & " for
+ * markup, ; = | { } $ \ for code, and a leading = + - @ that a spreadsheet
+ * would run as a formula when the list is exported to CSV.
+ */
+const NAME_PATTERN = /^\p{L}[\p{L}\p{M}\p{N} .,'’()/·-]*$/u
+export const NAME_MAX = 100
+
+export function isValidName(clean) {
+  const length = Array.from(clean).length
+  return length >= 2 && length <= NAME_MAX && NAME_PATTERN.test(clean)
+}
+
 /** Format 60123456789 back to 012-345 6789 for display. */
 export function displayPhone(normalised) {
   const local = `0${String(normalised).replace(/^60/, '')}`

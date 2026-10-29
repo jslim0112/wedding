@@ -1,3 +1,21 @@
+import heroPhoto from './assets/hero.jpg'
+import songFile from './assets/its-you.mp3'
+import photo_2026_rom from './assets/gallery/2026_rom.jpg'
+import photo_2026_krabi from './assets/gallery/2026_krabi.jpg'
+import photo_2026_bangkok from './assets/gallery/2026_bangkok.jpg'
+import photo_2025_alin_concert from './assets/gallery/2025_alin_concert.jpg'
+import photo_2025_guangzhou from './assets/gallery/2025_guangzhou.jpg'
+import photo_2025_phuket from './assets/gallery/2025_phuket.jpg'
+import photo_2025_cameron from './assets/gallery/2025_cameron.jpg'
+import photo_2024_ipoh from './assets/gallery/2024_ipoh.jpg'
+import photo_2024_taiwan from './assets/gallery/2024_taiwan.jpg'
+import photo_2024_baking from './assets/gallery/2024_baking.jpg'
+import photo_2023 from './assets/gallery/2023.jpg'
+import photo_2022_my_convo from './assets/gallery/2022_my_convo.jpg'
+import photo_2022_js_convo from './assets/gallery/2022_js_convo.jpg'
+import photo_2021 from './assets/gallery/2021.jpg'
+import photo_2020 from './assets/gallery/2020.jpg'
+
 /* ---------------------------------------------------------------------------
    Every wedding detail lives here.
    Change the venue at 11pm without opening a single component.
@@ -119,7 +137,7 @@ export const config = {
 
   hero: {
     // TODO: paste the Supabase Storage public URL for the main photo.
-    photo: { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2026_background.png?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI2X2JhY2tncm91bmQucG5nIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc5MzExNTUxNywiZXhwIjoxODI0NjUxNTE3fQ.r6E5DjADKXRNgVpw4Ory5l7lOOdc6QRiqrp-uLDXecE', alt: 'Jason and Mei Yean', slot: 'Hero photo — the two of you, landscape' },
+    photo: { src: heroPhoto, alt: 'Jason and Mei Yean', slot: 'Hero photo — the two of you, landscape' },
   },
 
   story: {
@@ -150,21 +168,21 @@ export const config = {
      leaves the train where the photo before it did.
      TODO: paste Supabase Storage public URLs and write the captions. */
   gallery: [
-    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2026_ROM.png?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI2X1JPTS5wbmciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzkzMTA3MzEzLCJleHAiOjE4MjQ2NDMzMTN9.d4xpW4xAMuEVSRoX6auZrZHuLGUOF8-r3z1KqEjtTHY', alt: '', slot: 'Gallery 8', caption: 'YEAR 2026\nOur ROM', caption_zh: '' },
-    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2026_Krabi.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI2X0tyYWJpLmpwZWciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzkzMTA2MjQxLCJleHAiOjE4MjQ2NDIyNDF9.AcBYhSuX2YM_3mVlJOJEm44FTSAlSjw9cBwSymHCrZs', alt: '', slot: 'Gallery 1', caption: 'YEAR 2026\nKrabi Trip', caption_zh: '' },
-    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2026%20BKK.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI2IEJLSy5qcGVnIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4OTU0OTQwOSwiZXhwIjoxODIxMDg1NDA5fQ.2S_nmCscS-1qLHd8z6tvPKMCSry3NE8gC9-IziMcROg', alt: '', slot: 'Gallery 2', caption: 'YEAR 2026\nBangkok Trip', caption_zh: '' },
-    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2025_alin_concert.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI1X2FsaW5fY29uY2VydC5qcGVnIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4ODc5MDk1MiwiZXhwIjoxODIwMzI2OTUyfQ.WYOcctVycRK18qpu2J0QsFMHL_30qKs4KlIvfjkTrPg', alt: '', slot: 'Gallery 3', caption: 'YEAR 2025\nA-Lin Concert', caption_zh: '' },
-    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2025_guangzhou.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI1X2d1YW5nemhvdS5qcGVnIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4OTU0NjE2MywiZXhwIjoxODIxMDgyMTYzfQ.yV4FRuEK_bvTfj4D46A1Xx8mU_iPpbvZ3RooEITvpbg', alt: '', slot: 'Gallery 4', caption: 'YEAR 2025\nGuangzhou Trip', caption_zh: '' },
-    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2025_phuket.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI1X3BodWtldC5qcGVnIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4OTU0NjIzNCwiZXhwIjoxODIxMDgyMjM0fQ.XvrfJXcoBGASMNO6VmNd0YPEuugiN_1UvU-TKNFZAQ0', alt: '', slot: 'Gallery 5', caption: 'YEAR 2025\nPhuket Trip', caption_zh: '' },
-    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2025_cameron.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI1X2NhbWVyb24uanBlZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODk1NTIzNzUsImV4cCI6MTgyMTA4ODM3NX0.8jT0GQAH92fK2ofMN0W2QBvOoQNwueE7eBOv3sjYCGo', alt: '', slot: 'Gallery 6', caption: 'YEAR 2025\nCameron Trip', caption_zh: '' },
-    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2024_ipoh.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI0X2lwb2guanBlZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODk1NTE2MzgsImV4cCI6MTgyMTA4NzYzOH0.JG1fY9UAs52l-pQuRiWpgZXkfEDHFXKFpAHNEBHF7Lw', alt: '', slot: 'Gallery 7', caption: 'YEAR 2024\nIpoh Trip ', caption_zh: '' },
-    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2024_taiwan.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI0X3RhaXdhbi5qcGVnIiwic2NvcGUiOiJkb3dubG9hZCIsImlhdCI6MTc4OTU0NjA5NywiZXhwIjoxODIxMDgyMDk3fQ.Fw8zJQBH-hZmfpSe7t6W85c8aG6y4K5lT8wnKKKT0mg', alt: '', slot: 'Gallery 8', caption: 'YEAR 2024\nTaiwan Trip ', caption_zh: '' },
-    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2024_baking_exp.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDI0X2Jha2luZ19leHAuanBlZyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODk1NTI1OTksImV4cCI6MTgyMTA4ODU5OX0.46HbHSF0AzaAvxG0tRq6ifEMZX6o0M67WrdJ1QvsyRI', alt: '', slot: 'Gallery 9', caption: 'YEAR 2024\nBaking Day', caption_zh: '' },
-    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2023.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDIzLmpwZWciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg4NzkwOTA2LCJleHAiOjE4MjAzMjY5MDZ9.8o46vQyllP2perlmIlb5yCrLyqBJC2v3eyNquYraUmw', alt: '', slot: 'Gallery 10', caption: 'YEAR 2023\nValentine\'s Day ', caption_zh: '' },
-    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2022_MY%20Convo.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDIyX01ZIENvbnZvLmpwZWciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg5NTUxMzQzLCJleHAiOjE4MjEwODczNDN9.8X1XUpWjCWPDKKZAZv5axVlf-ZYN7Hls657wCsXQVH4', alt: '', slot: 'Gallery 11', caption: 'YEAR 2022\nMeiyean\'s Convo', caption_zh: '' },
-    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2022_JS%20Convo.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDIyX0pTIENvbnZvLmpwZWciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg5NTUxMzM2LCJleHAiOjE4MjEwODczMzZ9.3d-KSlAKHXUzxaOKaYs7I8W4O49TteUyPbs4EI5VHdo', alt: '', slot: 'Gallery 12', caption: 'YEAR 2022\nJason\'s Convo ', caption_zh: '' },
-    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2021.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDIxLmpwZWciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg5NTQ5NDQyLCJleHAiOjE4MjEwODU0NDJ9.hY0Thj__wwep3slTaSF57JHenTxYs56lSmeZa7InGLU', alt: '', slot: 'Gallery 13', caption: 'YEAR 2021\nValentine\'s Day ', caption_zh: '' },
-    { src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/2020.jpeg?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC8yMDIwLmpwZWciLCJzY29wZSI6ImRvd25sb2FkIiwiaWF0IjoxNzg5NTQ5NDI3LCJleHAiOjE4MjEwODU0Mjd9.ykTPmnsKb0dr_GqfeSs8JPFZfci9pYY-2gwIKyCudUY', alt: '', slot: 'Gallery 14', caption: 'YEAR 2020\nFirst Dating', caption_zh: '' },
+    { src: photo_2026_rom, alt: '', slot: 'Gallery 8', caption: 'YEAR 2026\nOur ROM', caption_zh: '' },
+    { src: photo_2026_krabi, alt: '', slot: 'Gallery 1', caption: 'YEAR 2026\nKrabi Trip', caption_zh: '' },
+    { src: photo_2026_bangkok, alt: '', slot: 'Gallery 2', caption: 'YEAR 2026\nBangkok Trip', caption_zh: '' },
+    { src: photo_2025_alin_concert, alt: '', slot: 'Gallery 3', caption: 'YEAR 2025\nA-Lin Concert', caption_zh: '' },
+    { src: photo_2025_guangzhou, alt: '', slot: 'Gallery 4', caption: 'YEAR 2025\nGuangzhou Trip', caption_zh: '' },
+    { src: photo_2025_phuket, alt: '', slot: 'Gallery 5', caption: 'YEAR 2025\nPhuket Trip', caption_zh: '' },
+    { src: photo_2025_cameron, alt: '', slot: 'Gallery 6', caption: 'YEAR 2025\nCameron Trip', caption_zh: '' },
+    { src: photo_2024_ipoh, alt: '', slot: 'Gallery 7', caption: 'YEAR 2024\nIpoh Trip ', caption_zh: '' },
+    { src: photo_2024_taiwan, alt: '', slot: 'Gallery 8', caption: 'YEAR 2024\nTaiwan Trip ', caption_zh: '' },
+    { src: photo_2024_baking, alt: '', slot: 'Gallery 9', caption: 'YEAR 2024\nBaking Day', caption_zh: '' },
+    { src: photo_2023, alt: '', slot: 'Gallery 10', caption: 'YEAR 2023\nValentine\'s Day ', caption_zh: '' },
+    { src: photo_2022_my_convo, alt: '', slot: 'Gallery 11', caption: 'YEAR 2022\nMeiyean\'s Convo', caption_zh: '' },
+    { src: photo_2022_js_convo, alt: '', slot: 'Gallery 12', caption: 'YEAR 2022\nJason\'s Convo ', caption_zh: '' },
+    { src: photo_2021, alt: '', slot: 'Gallery 13', caption: 'YEAR 2021\nValentine\'s Day ', caption_zh: '' },
+    { src: photo_2020, alt: '', slot: 'Gallery 14', caption: 'YEAR 2020\nFirst Dating', caption_zh: '' },
   ],
 
   /* The floating music player, bottom-left of every screen.
@@ -180,8 +198,8 @@ export const config = {
      Keep it under about 6 MB or guests on mobile data will wait for it. */
   music: {
     bucket: 'wedding-photos',
-    path: 'its_you_opening_cut.mp3',
-    src: 'https://jdenqrfjrdvgtpfqimts.supabase.co/storage/v1/object/sign/Wedding%20bucket/Its%20You.mp3?token=eyJraWQiOiI0N2NkNTRjMi01YTEzLTQyNDEtYjFiZC1mNTIxZTcxNjBiMWEiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJXZWRkaW5nIGJ1Y2tldC9JdHMgWW91Lm1wMyIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3OTMyODUzMTcsImV4cCI6MTgyNDgyMTMxN30.s9SR9dp3B1ZJT6LXoqymWRmQESWQEOIIBg9iGcbbiQg',
+    path: '',
+    src: songFile,
     title: 'Our song',
     artist: 'Henry',
     // 0 to 1. Background music wants to sit under conversation, not over it.
