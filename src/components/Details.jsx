@@ -6,7 +6,7 @@ import Section from './ui/Section'
 import Reveal from './ui/Reveal'
 import Divider from './ui/Divider'
 import { FallingPetals, PlumBranch, PlumSprig } from './ui/Blossom'
-import homestayLogo from '../assets/jaya-homestay.png'
+import homestayLogo from '../assets/jaya-homestay.jpg'
 
 /* ---------------------------------------------------------------------------
    The details, set as one wedding invitation card: the month with the day in

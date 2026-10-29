@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { config } from '../config'
 import { isSupabaseConfigured, supabase } from '../lib/supabase'
-import { normalisePhone, isValidPhone, whatsappUrl } from '../lib/format'
+import { NAME_MAX, cleanName, isValidName, normalisePhone, isValidPhone, whatsappUrl } from '../lib/format'
 import { calendarDevice, downloadWeddingIcs, weddingGoogleCalendarUrl } from '../lib/calendar'
 import { releaseBalloons } from '../lib/balloons'
 import { prefersReducedMotion } from '../lib/motion'
@@ -25,6 +25,9 @@ const EMPTY_FORM = {
 function seatCount(value) {
   return value.trim() === '' ? 0 : Number(value)
 }
+
+/** Whole digits only: Number() would also accept '1e1', '0x10' and ' 5 '. */
+const isWholeNumber = (value) => /^\d{1,3}$/.test(value.trim())
 
 /** The confirmation stamp: seal red for a yes, rail grey for a no. */
 function Stamp({ attending }) {
@@ -119,17 +122,23 @@ export default function Rsvp() {
   // Every message is a pair - the guest reads whichever half they read.
   function validate() {
     const next = {}
-    const name = form.fullName.trim()
+    const name = cleanName(form.fullName)
+    const nameLength = Array.from(name).length
 
-    if (name.length < 2)
+    if (nameLength < 2)
       next.fullName = {
         en: 'Please tell us your name so we know who to expect.',
         zh: '请填写您的姓名，让我们知道是谁来。',
       }
-    else if (name.length > 100)
+    else if (nameLength > NAME_MAX)
       next.fullName = {
         en: 'That is longer than we can save — please shorten it.',
         zh: '名字太长了，请缩短一些。',
+      }
+    else if (!isValidName(name))
+      next.fullName = {
+        en: 'Please use letters only. Spaces and . , \' - ( ) are fine.',
+        zh: '请只使用文字，可包含空格及 . , \' - ( )。',
       }
 
     if (!form.phone.trim())
@@ -158,13 +167,13 @@ export default function Rsvp() {
           en: 'Tell us how many adults to seat.',
           zh: '请填写成人人数。',
         }
-      else if (!Number.isInteger(adults) || adults < 1 || adults > rsvp.maxPax)
+      else if (!isWholeNumber(form.adults) || adults < 1 || adults > rsvp.maxPax)
         next.adults = {
           en: `Pick a number between 1 and ${rsvp.maxPax}.`,
           zh: `请填写 1 至 ${rsvp.maxPax} 之间的数字。`,
         }
 
-      if (form.children.trim() && (!Number.isInteger(children) || children < 0 || children > rsvp.maxPax))
+      if (form.children.trim() && (!isWholeNumber(form.children) || children < 0 || children > rsvp.maxPax))
         next.children = {
           en: `Pick a number between 0 and ${rsvp.maxPax}, or leave it blank.`,
           zh: `请填写 0 至 ${rsvp.maxPax} 之间的数字，或留空。`,
@@ -224,7 +233,7 @@ export default function Rsvp() {
     // lines up with the ones after it.
     const { error } = await supabase.from('rsvps').insert([
       {
-        full_name: form.fullName.trim(),
+        full_name: cleanName(form.fullName),
         phone: normalisePhone(form.phone),
         attending: form.attending,
         adults,
@@ -408,6 +417,7 @@ export default function Rsvp() {
                   {...p}
                   type="text"
                   autoComplete="name"
+                  maxLength={NAME_MAX}
                   className={inputClass}
                   value={form.fullName}
                   onChange={set('fullName')}
@@ -429,6 +439,7 @@ export default function Rsvp() {
                   type="tel"
                   inputMode="tel"
                   autoComplete="tel"
+                  maxLength={20}
                   placeholder="012-345 6789"
                   className={inputClass}
                   value={form.phone}

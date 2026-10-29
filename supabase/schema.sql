@@ -1,22 +1,36 @@
 -- Run this once in the Supabase SQL Editor.
 -- It creates the RSVP table and locks it down.
+-- Already have the table? Run supabase/harden.sql instead: it adds the checks
+-- below (and raises the seat ceiling from 20 to 30, to match config.js).
 
 create table public.rsvps (
   id          uuid primary key default gen_random_uuid(),
   created_at  timestamptz not null default now(),
-  full_name   text    not null check (char_length(trim(full_name)) between 2 and 100),
-  phone       text    not null check (char_length(trim(phone)) between 7 and 20),
+  full_name   text    not null constraint rsvps_full_name_check check (
+    char_length(full_name) between 2 and 100
+    and full_name = btrim(full_name)
+    and full_name !~ '^[=+@-]'
+    and full_name !~ '[<>&"`;=$|{}\\\x01-\x1f\x7f]'
+  ),
+  -- Stored as 60 followed by 8-10 digits: the form normalises it first.
+  phone       text    not null constraint rsvps_phone_check check (phone ~ '^60[0-9]{8,10}$'),
   attending   boolean not null,
   -- The form asks for these two separately - the caterer counts a child's seat
   -- differently from an adult's. A guest who cannot come sends 0 and 0.
-  adults      int     not null check (adults   between 0 and 20),
-  children    int     not null check (children between 0 and 20),
+  -- 30 matches rsvp.maxPax in config.js.
+  adults      int     not null constraint rsvps_adults_check   check (adults   between 0 and 30),
+  children    int     not null constraint rsvps_children_check check (children between 0 and 30),
   -- No default. The form makes this a required answer, so a row arriving
   -- without one is a bug worth failing loudly rather than quietly seating 1.
   -- Kept as the total of the two above: it is what the seating plan is counted
   -- from, and it keeps rows collected before the split comparable with the
   -- ones after it.
-  pax         int     not null check (pax between 0 and 20)
+  pax         int     not null constraint rsvps_pax_check check (pax = adults + children and pax between 0 and 30),
+
+  -- Coming means at least one adult; not coming means no seats at all.
+  constraint rsvps_seats_check check (
+    (attending and adults >= 1) or (not attending and adults = 0 and children = 0)
+  )
 );
 
 alter table public.rsvps enable row level security;
