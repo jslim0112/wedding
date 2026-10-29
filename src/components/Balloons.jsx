@@ -15,8 +15,7 @@ import { XI } from './ui/XiPattern'
 
    The layer is fixed over everything but takes no pointer events of its own,
    so it never blocks a scroll, a link or the form; only a balloon itself
-   catches a tap. It sits under the music player, the gallery's full-screen
-   view and the entry screen.
+   catches a tap. It sits under the music player and the entry screen.
 
    Strays keep out of the way of the text: on a wide screen they rise only in
    the margins either side of the document column, and on a phone they hug an

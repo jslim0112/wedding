@@ -1,15 +1,132 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { config } from '../config'
+import { prefersReducedMotion } from '../lib/motion'
 import Section from './ui/Section'
 import Reveal from './ui/Reveal'
 import Photo from './ui/Photo'
 
-/* The photo frame's shape. The arrows are centred on the photo rather than on
-   the whole slide, so their overlay is given the same aspect — change this in
-   one place and the two stay aligned however tall the captions run. */
-const FRAME_ASPECT = 'aspect-square'
+/* ---------------------------------------------------------------------------
+   The gallery: a pile of polaroids with the top one on show. Swiping it to
+   either way (or pressing Next) moves on to the next photo; only Previous
+   goes back to the one before. Under the pile, each year
+   is a station on a little railway, and a train rides it along with the
+   photos; tapping a station brings that year's first photo to the top.
 
-/** Chevron for the two carousel arrows. `back` mirrors it. */
+   Every move looks the same, whichever way it goes: the photo on top flies
+   off the way it was swiped and fades out, then the new one fades in on top
+   of the pile.
+
+   While the pile is on screen the gallery also moves on by itself, every
+   few seconds. It gives way to the guest: it waits a while after their own
+   swipe or tap, holds still while a mouse rests on it or the keyboard is
+   inside it, stops when it is scrolled away or the tab is hidden, and never
+   runs at all for a guest who asked for reduced motion.
+
+   Only the top polaroid moves. The three under it never change position -
+   only the photos printed on them do - so the pile looks the same at every
+   step and there is nothing to keep in sync.
+--------------------------------------------------------------------------- */
+
+/** How long the top polaroid takes to fly off and fade out. */
+const TOSS_MS = 320
+
+/** How long the new top polaroid takes to fade in. */
+const FADE_IN_MS = 240
+
+/** A drag further than this, either way, throws the photo off. */
+const TOSS_DISTANCE = 70
+
+/** Movement under this is a wobble of the finger, not a drag. */
+const TAP_SLOP = 6
+
+/** How long each photo stays on top while the gallery runs by itself. */
+const AUTOPLAY_MS = 3000
+
+/** How long it waits after a guest's own swipe or tap before running again. */
+const RESUME_MS = 8000
+
+/* Where the polaroids under the top one lie: nudged and turned a little,
+   each its own way, so the edges of the pile show. Bottom first. */
+const PILE = [
+  'translate(-3px, 15px) rotate(-1.5deg)',
+  'translate(11px, 11px) rotate(3.5deg)',
+  'translate(-9px, 7px) rotate(-4deg)',
+]
+
+/* The top polaroid at rest: very nearly straight, as if just put down. */
+const REST = 'rotate(1deg)'
+
+/* The train's trip between two photos: a short hop between photos of one
+   year is quick, a run along the whole line slower. Milliseconds, scaled
+   from how far it goes along the line (0 to 1). */
+const tripMs = (distance) => Math.round(Math.min(1100, Math.max(380, 300 + Math.abs(distance) * 720)))
+
+const TRIP_EASE = 'ease-[cubic-bezier(0.45,0.05,0.3,1)]'
+
+/** A point on the line, from 0 at the first station to 1 at the last. */
+const along = (f) => `calc(22px + (100% - 44px) * ${f})`
+
+/**
+ * Where each photo puts the train, from 0 (the first station) to 1 (the
+ * last). A year's first photo stops it at that year's station; each photo
+ * after it moves it an equal share of the way on towards the next year - a
+ * third at a time for a year of three photos. The last year's photos all
+ * wait at its station, and a photo with no year leaves the train wherever the
+ * one before it did.
+ */
+function trainSpots(photos, years) {
+  const station = (k) => (years.length > 1 ? k / (years.length - 1) : 0)
+  let spot = 0
+  return photos.map((photo, i) => {
+    const k = years.indexOf(photo.year)
+    if (k === -1) return spot
+    const ofYear = photos.filter((p) => p.year === photo.year).length
+    const before = photos.slice(0, i).filter((p) => p.year === photo.year).length
+    spot = k === years.length - 1 ? station(k) : station(k) + (before / ofYear) * (station(k + 1) - station(k))
+    return spot
+  })
+}
+
+/**
+ * The little steam engine, facing right. Drawn flat in the palette, like the
+ * agenda's spot illustrations; the wheels are separate so they can turn.
+ */
+function Engine({ face }) {
+  return (
+    <svg
+      viewBox="0 0 32 22"
+      className="train-body block h-[22px] w-8 transition-transform duration-200"
+      style={{ transform: `scaleX(${face})` }}
+    >
+      <rect x="2" y="2" width="12" height="3" rx="1" className="fill-ink" />
+      <rect x="3" y="4.5" width="10" height="10.5" className="fill-seal" />
+      <rect x="5.5" y="6.5" width="5" height="4" rx="1" className="fill-paper" />
+      <rect x="13" y="8" width="13.5" height="7" rx="3.5" className="fill-seal" />
+      <rect x="17.5" y="8" width="1.3" height="7" className="fill-ochre" />
+      <rect x="21" y="3.4" width="3.4" height="5" className="fill-ink" />
+      <rect x="20.2" y="2.2" width="5" height="1.6" rx="0.5" className="fill-ink" />
+      <circle cx="27.4" cy="10.4" r="1.1" className="fill-gilt" />
+      <path d="M26 15L30.5 18.6H26Z" className="fill-ink" />
+      <rect x="3" y="15" width="24" height="1.6" className="fill-ink" />
+      {[
+        [8, 18.4, 3],
+        [16, 18.9, 2.5],
+        [23, 18.9, 2.5],
+      ].map(([cx, cy, r]) => (
+        <g key={cx} className="train-wheel">
+          <circle cx={cx} cy={cy} r={r} className="fill-ink" />
+          <path
+            d={`M${cx} ${cy - r + 0.4}V${cy + r - 0.4}M${cx - r + 0.4} ${cy}H${cx + r - 0.4}`}
+            strokeWidth="0.8"
+            className="stroke-ochre"
+          />
+        </g>
+      ))}
+    </svg>
+  )
+}
+
+/** Chevron for the arrows. `back` mirrors it. */
 function Chevron({ back = false }) {
   return (
     <svg
@@ -27,440 +144,440 @@ function Chevron({ back = false }) {
   )
 }
 
-/* The viewer's arrows sit on a near-black backdrop, so they invert the
-   carousel's: paper-coloured glass rather than paper-coloured card. */
-const VIEWER_ARROW =
-  'absolute top-1/2 z-10 flex size-10 -translate-y-1/2 items-center justify-center rounded-full border border-paper/30 bg-paper/10 text-paper transition-colors hover:bg-paper/25 sm:size-12'
-
 const ARROW =
-  'pointer-events-auto flex size-9 items-center justify-center rounded-full border border-rail/30 bg-paper/85 text-kopi shadow-sm transition-colors hover:bg-paper hover:text-ink sm:size-10'
+  'flex size-11 items-center justify-center rounded-full border border-rail/60 bg-paper text-ink transition-colors hover:border-ochre hover:text-kopi'
+
+/**
+ * Splits a caption into the year on its first line and the event after it,
+ * so 'YEAR 2026\nOur ROM' prints as "Our ROM" with "2026" beside it. A
+ * caption whose first line has no year in it is all title, and has no year.
+ */
+function captionParts(caption = '') {
+  const [first, ...rest] = caption.split('\n')
+  const year = first.match(/\b\d{4}\b/)?.[0]
+  if (year && rest.join('').trim()) return { year, title: rest.join(' ').trim() }
+  return { year: null, title: caption.trim() }
+}
+
+/**
+ * One polaroid: the photo cropped to the print's tall shape, a little above
+ * centre where faces usually are, with its caption written underneath.
+ */
+function Polaroid({ photo, className = '', style, ...props }) {
+  return (
+    <div
+      className={`mx-auto block w-[280px] bg-white p-3 pb-0 shadow-[0_1px_2px_rgba(74,27,41,0.14),0_10px_26px_rgba(74,27,41,0.16)] select-none sm:w-[340px] sm:p-3.5 sm:pb-0 ${className}`}
+      style={style}
+      {...props}
+    >
+      <div className="aspect-[4/5] overflow-hidden bg-card">
+        <Photo photo={photo} imgClassName="pointer-events-none object-[50%_35%]" />
+      </div>
+      <div className="flex items-baseline justify-between gap-2 px-1 pt-3.5 pb-4">
+        <div className="min-w-0">
+          {photo.title && (
+            <p className="font-caption text-[1.4rem] leading-tight text-ink sm:text-[1.65rem]">{photo.title}</p>
+          )}
+          {photo.caption_zh && (
+            <p className="zh mt-0.5 text-[0.85rem] leading-snug text-ink">{photo.caption_zh}</p>
+          )}
+        </div>
+        {photo.year && <p className="ticket-data shrink-0 text-[0.7rem] text-rail">{photo.year}</p>}
+      </div>
+    </div>
+  )
+}
 
 export default function Gallery() {
-  const photos = config.gallery
-  const count = photos.length
-  // Only slots with a real URL can be opened full screen. Placeholders stay
-  // inert, but they still take a turn in the carousel so you can see which
+  // In the order written in config.js - newest first - each with its
+  // caption split for the polaroid. A slot with no URL yet still takes its
+  // turn on the pile, as a labelled placeholder, so you can see which
   // pictures are still missing.
-  const viewable = photos.map((photo, slide) => ({ ...photo, slide })).filter((p) => p.src)
+  const photos = config.gallery.map((photo) => ({ ...photo, ...captionParts(photo.caption) }))
+  const count = photos.length
 
-  /* The strip carries a copy of the last photo before the first, and a copy of
-     the first after the last. Swiping off either end lands on a copy, and the
-     moment it settles there the strip is moved — without animation, so it is
-     invisible — to the real photo at the other end. That is what makes the
-     carousel loop under a swipe and not just under the arrows.
+  // The stations on the line: each year once, in the order the photos reach
+  // it, and the point on the line that each photo puts the train.
+  const years = [...new Set(photos.map((p) => p.year).filter(Boolean))]
+  const spots = trainSpots(photos, years)
 
-     Positions run over this padded strip; `index` is the real photo showing. */
-  const loop = count > 1
-  const slides = loop ? [photos[count - 1], ...photos, photos[0]] : photos
-  const positionOf = (photoIndex) => (loop ? photoIndex + 1 : photoIndex)
-  const photoAt = (position) => (loop ? (position - 1 + count) % count : position)
+  /* `index` is the photo on top, and `base` the one the pile underneath is
+     counted from. `base` catches up with `index` only once a new photo has
+     faded in, so the pile never changes under a photo while it is still see-
+     through. `fly` is -1 or 1 while the top polaroid is flying off to that
+     side, and 0 otherwise. `entering` holds it invisible and a touch small,
+     ready to fade in. `snap` turns its transition off for a moment, so it can
+     be changed without being seen to travel there. */
+  const [pile, setPile] = useState({ index: 0, base: 0, fly: 0, entering: false, snap: false })
+  const [dragX, setDragX] = useState(null)
 
-  const trackRef = useRef(null)
-  const triggersRef = useRef([])
-  const dialogRef = useRef(null)
-  const settleRef = useRef(0)
-  const swipeRef = useRef(null)
-  // Where the strip is heading. `index` only catches up once a scroll event
-  // lands, so stepping off it would make two quick presses of Next aim at the
-  // same photo twice; this is updated the moment a press is handled.
-  const targetRef = useRef(0)
-  const [index, setIndex] = useState(0)
-  const [openAt, setOpenAt] = useState(null)
+  /* The train sets off the moment a move starts, rather than waiting for
+     the photo to change, so `at` is the photo it is heading for. `face` is
+     the way it points, `trip` how long this run takes, `moving` whether the
+     wheels are turning, and `puff` counts the stops, each of which lets out
+     a fresh puff of steam. */
+  const [at, setAt] = useState(0)
+  const [train, setTrain] = useState({ face: 1, trip: 0, moving: false, puff: 0 })
 
-  /* ---------------------------------------------------------------------
-     The carousel is a scroll-snap strip rather than a transform slider, so
-     a phone swipe is the browser's own scrolling — nothing to implement,
-     and it stays in step with the arrows because both read scrollLeft.
-  --------------------------------------------------------------------- */
-  const scrollToPosition = useCallback((position, animate = true) => {
-    const track = trackRef.current
-    if (!track) return
+  const dragRef = useRef(null)
+  // Set once a press has moved far enough to count as a drag.
+  const draggedRef = useRef(false)
+  // Read by handlers that would otherwise see the state from before a toss.
+  const busyRef = useRef(false)
+  const timersRef = useRef([])
+  const arriveRef = useRef(0)
 
-    const left = position * track.clientWidth
-    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-
-    if (animate && !reduce) {
-      track.scrollTo({ left, behavior: 'smooth' })
-      return
-    }
-
-    // scrollTo with behavior 'auto' still defers to the CSS scroll-behavior,
-    // which is smooth here — so the jump has to suppress it outright.
-    const previous = track.style.scrollBehavior
-    track.style.scrollBehavior = 'auto'
-    track.scrollLeft = left
-    track.style.scrollBehavior = previous
+  const later = useCallback((fn, ms) => {
+    timersRef.current.push(window.setTimeout(fn, ms))
   }, [])
 
-  /** Jump straight to a photo — used by the dots and the full-screen viewer. */
-  const goTo = useCallback(
-    (photoIndex) => {
-      const clamped = Math.max(0, Math.min(photoIndex, count - 1))
-      targetRef.current = clamped
-      scrollToPosition(positionOf(clamped))
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [count, loop, scrollToPosition],
-  )
+  useEffect(() => {
+    const timers = timersRef.current
+    return () => {
+      timers.forEach(window.clearTimeout)
+      window.clearTimeout(arriveRef.current)
+    }
+  }, [])
+
+  /* Running by itself. `onScreen` is whether at least half the pile is in
+     view; `paused` whether a mouse rests on the gallery or the keyboard is
+     inside it. `lastMoveRef` holds when the pile last moved and how long the
+     photo on top should then be left alone - a normal turn after the
+     gallery's own move, a longer one after the guest's. The timer outlives
+     renders, so it calls the latest `next` through `nextRef` rather than the
+     one it was made with, which would keep aiming at the same photo. */
+  const stackRef = useRef(null)
+  const nextRef = useRef(null)
+  const lastMoveRef = useRef({ at: 0, wait: AUTOPLAY_MS })
+  const [onScreen, setOnScreen] = useState(false)
+  const [paused, setPaused] = useState(false)
+  const autoplay = count > 1 && onScreen && !paused && !prefersReducedMotion()
+
+  useEffect(() => {
+    const stack = stackRef.current
+    if (!stack || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(([entry]) => setOnScreen(entry.isIntersecting), {
+      threshold: 0.5,
+    })
+    observer.observe(stack)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!autoplay) return
+    // Coming into view, or out from under the mouse, gives the photo on top
+    // a full turn first - unless the guest's own wait is still running.
+    const { at, wait } = lastMoveRef.current
+    if (Date.now() - at >= wait) lastMoveRef.current = { at: Date.now(), wait: AUTOPLAY_MS }
+
+    const id = window.setInterval(() => {
+      // Nobody is looking, or a finger is on the photo: the clock waits too.
+      if (document.hidden || dragRef.current) {
+        lastMoveRef.current = { ...lastMoveRef.current, at: Date.now() }
+        return
+      }
+      if (busyRef.current || Date.now() - lastMoveRef.current.at < lastMoveRef.current.wait) return
+      lastMoveRef.current = { at: Date.now(), wait: AUTOPLAY_MS }
+      nextRef.current?.()
+    }, 250)
+    return () => window.clearInterval(id)
+  }, [autoplay])
+
+  if (count === 0) return null
 
   /**
-   * Step one photo either way from where the strip is heading. Stepping off
-   * an end scrolls onto the copy there, so the picture slides in from the
-   * expected side; the settle below then swaps in the real one.
+   * Put photo `target` on top: the one there now flies off towards side
+   * `dir` (1 right, -1 left) and fades out, then `target` fades in.
    */
-  const step = (delta) => {
-    const next = targetRef.current + delta
+  const go = (target, dir) => {
+    if (count < 2 || busyRef.current || target === pile.index) return
+    setDragX(null)
+    ride(target)
 
-    if (!loop) {
-      goTo(next)
+    if (prefersReducedMotion()) {
+      setPile({ index: target, base: target, fly: 0, entering: false, snap: false })
       return
     }
 
-    targetRef.current = (next + count) % count
-    scrollToPosition(next + 1)
+    busyRef.current = true
+    setPile((p) => ({ ...p, fly: dir, snap: false }))
+    later(() => {
+      // Swap the photo while the polaroid is invisible, and bring it back
+      // to rest, still invisible, without being seen to travel there...
+      setPile((p) => ({ ...p, index: target, fly: 0, entering: true, snap: true }))
+      // ...then, a frame later so the browser has drawn it there, fade in.
+      later(() => {
+        setPile((p) => ({ ...p, entering: false, snap: false }))
+        later(() => {
+          setPile((p) => ({ ...p, base: p.index }))
+          busyRef.current = false
+        }, FADE_IN_MS)
+      }, 40)
+    }, TOSS_MS)
   }
 
-  const onScroll = () => {
-    const track = trackRef.current
-    if (!track || !track.clientWidth) return
+  /** Send the train along the line to where photo `target` puts it. */
+  const ride = (target) => {
+    const distance = spots[target] - spots[at]
+    setAt(target)
+    if (Math.abs(distance) < 0.001) return
 
-    const exact = track.scrollLeft / track.clientWidth
-    const position = Math.round(exact)
-    setIndex(photoAt(position))
-
-    // Only a settled strip re-aims the target or gets moved. Acting on the
-    // halfway positions of a running animation would undo the point of it.
-    if (Math.abs(exact - position) > 0.02) return
-    targetRef.current = photoAt(position)
-
-    if (!loop || (position !== 0 && position !== slides.length - 1)) return
-
-    // Landed on a copy. Let any momentum die down, then move across.
-    window.clearTimeout(settleRef.current)
-    settleRef.current = window.setTimeout(() => {
-      scrollToPosition(position === 0 ? count : 1, false)
-    }, 80)
+    const trip = tripMs(distance)
+    window.clearTimeout(arriveRef.current)
+    setTrain((t) => ({ ...t, face: distance > 0 ? 1 : -1, trip, moving: true }))
+    arriveRef.current = window.setTimeout(() => {
+      setTrain((t) => ({ ...t, moving: false, puff: t.puff + 1 }))
+    }, trip)
   }
 
-  // Open on the first real photo rather than on the copy that precedes it.
-  useLayoutEffect(() => {
-    if (loop) scrollToPosition(1, false)
-    return () => window.clearTimeout(settleRef.current)
-  }, [loop, scrollToPosition])
+  const next = () => go((pile.index + 1) % count, 1)
+  const back = () => go((pile.index - 1 + count) % count, -1)
+  nextRef.current = next
 
-  /* ---------------------------------------------------------------------
-     The full-screen viewer, opened by tapping the photo on show.
-  --------------------------------------------------------------------- */
-  const close = useCallback(() => {
-    setOpenAt((current) => {
-      if (current !== null) {
-        const slide = viewable[current]?.slide
-        requestAnimationFrame(() => triggersRef.current[slide]?.focus())
-      }
-      return null
-    })
-  }, [viewable])
-
-  /** Move the viewer one photo either way, wrapping at both ends. */
-  const stepViewer = useCallback(
-    (delta) => {
-      setOpenAt((i) => (i === null ? i : (i + delta + viewable.length) % viewable.length))
-    },
-    [viewable.length],
-  )
-
-  /* A swipe across the viewer moves to the next photo. Pointer events cover
-     touch and a mouse drag in one path, and only the primary pointer counts,
-     so a pinch to zoom into a photo is never read as a swipe. */
-  const onPointerDown = (event) => {
-    if (!event.isPrimary) return
-    swipeRef.current = { x: event.clientX, y: event.clientY, swiped: false }
+  /** A guest moved it themselves: let them look before running on again. */
+  const hold = () => {
+    lastMoveRef.current = { at: Date.now(), wait: RESUME_MS }
   }
 
-  const onPointerUp = (event) => {
-    const start = swipeRef.current
-    if (!start || !event.isPrimary) return
-
-    const dx = event.clientX - start.x
-    const dy = event.clientY - start.y
-
-    // Horizontal, and far enough to be deliberate rather than a sloppy tap.
-    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
-      start.swiped = true
-      stepViewer(dx < 0 ? 1 : -1)
-    }
+  /** The first photo of that year. Older years lie further on, to the right. */
+  const jumpTo = (year) => {
+    hold()
+    const k = photos.findIndex((p) => p.year === year)
+    if (k >= 0) go(k, k > pile.index ? 1 : -1)
   }
 
-  /* Tapping the backdrop closes — but a swipe ends in a click too, and that
-     click would otherwise shut the viewer the instant it changed photo. */
-  const onBackdropClick = () => {
-    if (swipeRef.current?.swiped) {
-      swipeRef.current = null
-      return
-    }
-    close()
+  /* A mouse resting on the gallery holds it still - a finger touching it
+     does not, or it would stay paused until the guest tapped somewhere else.
+     So does keyboard focus inside it, but not the focus a click leaves on a
+     button, for the same reason. */
+  const onGalleryPointerEnter = (event) => {
+    if (event.pointerType === 'mouse') setPaused(true)
   }
 
-  useEffect(() => {
-    if (openAt === null) return
+  const onGalleryPointerLeave = (event) => {
+    if (event.pointerType === 'mouse') setPaused(false)
+  }
 
-    const onKey = (event) => {
-      if (event.key === 'Escape') {
-        close()
-      } else if (event.key === 'ArrowRight') {
-        stepViewer(1)
-      } else if (event.key === 'ArrowLeft') {
-        stepViewer(-1)
-      }
-    }
+  const onGalleryFocus = (event) => {
+    if (event.target.matches?.(':focus-visible')) setPaused(true)
+  }
 
-    document.addEventListener('keydown', onKey)
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    dialogRef.current?.focus()
+  const onGalleryBlur = (event) => {
+    if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false)
+  }
 
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = previousOverflow
-    }
-  }, [openAt, viewable.length, close])
+  /* Dragging the top polaroid. touch-action on it leaves vertical swipes to
+     the browser, so a guest scrolling past with a thumb on the photo still
+     scrolls the page - the browser then sends pointercancel, and the drag is
+     dropped. Only a sideways drag is ours. */
+  const onCardPointerDown = (event) => {
+    if (!event.isPrimary || count < 2 || busyRef.current) return
+    hold()
+    dragRef.current = { x: event.clientX }
+    draggedRef.current = false
+    event.currentTarget.setPointerCapture?.(event.pointerId)
+  }
 
-  // Stepping through the viewer with the arrow keys carries the carousel
-  // along, so closing it leaves the strip on the photo last looked at.
-  useEffect(() => {
-    if (openAt === null) return
-    const slide = viewable[openAt]?.slide
-    if (slide !== undefined && slide !== index) goTo(slide)
-  }, [openAt, viewable, index, goTo])
+  const onCardPointerMove = (event) => {
+    const drag = dragRef.current
+    if (!drag) return
+    const dx = event.clientX - drag.x
+    if (!draggedRef.current && Math.abs(dx) < TAP_SLOP) return
+    draggedRef.current = true
+    setDragX(dx)
+  }
 
-  const current = openAt === null ? null : viewable[openAt]
+  const onCardPointerUp = (event) => {
+    const drag = dragRef.current
+    if (!drag) return
+    dragRef.current = null
+    hold()
+    const dx = event.clientX - drag.x
+    // A swipe either way moves on to the next photo, the polaroid flying off
+    // the side it was thrown towards.
+    if (draggedRef.current && Math.abs(dx) > TOSS_DISTANCE) go((pile.index + 1) % count, dx > 0 ? 1 : -1)
+    else setDragX(null)
+  }
+
+  const onCardPointerCancel = () => {
+    dragRef.current = null
+    draggedRef.current = false
+    setDragX(null)
+  }
+
+  /* Where the top polaroid is, and how it gets there: flying off and fading
+     out, held invisible to fade in, following a finger, or springing back to
+     rest with a small overshoot. */
+  let topTransform = REST
+  let topTransition = `transform 280ms cubic-bezier(0.2, 0.9, 0.3, 1.25), opacity ${FADE_IN_MS}ms ease-out`
+  let topOpacity = 1
+  if (pile.fly) {
+    topTransform = `translate(${pile.fly * 150}%, 30px) rotate(${pile.fly * 26}deg)`
+    topTransition = `transform ${TOSS_MS}ms ease-in, opacity ${TOSS_MS}ms ease-in`
+    topOpacity = 0
+  } else if (pile.entering) {
+    topTransform = `${REST} scale(0.96)`
+    topOpacity = 0
+  } else if (dragX !== null) {
+    topTransform = `translate(${dragX}px, ${Math.abs(dragX) * 0.08}px) rotate(${1 + dragX / 16}deg)`
+    topTransition = 'none'
+  }
+  if (pile.snap) topTransition = 'none'
+
+  const top = photos[pile.index]
+  // The line follows the train, which is already on its way to `at`.
+  const spot = spots[at]
+  const atYear = years.indexOf(photos[at].year)
+  const stations = years.map((_, k) => k / Math.max(years.length - 1, 1))
+  // Up to three under the top one, bottom of the pile first.
+  const under = PILE.slice(-Math.min(count - 1, PILE.length)).map((transform, i, list) => ({
+    photo: photos[(pile.base + list.length - i) % count],
+    transform,
+  }))
 
   return (
-    <Section id="gallery" label="" title="Ours" title_zh="我们">
-      <Reveal>
-        {/* overflow-x-clip stops the strip's width reaching the page. Even
-            though the track scrolls and clips its own content, the slides
-            still count towards the document's scrollable width — 5325px
-            against a 390px phone — and a swipe that reaches the end of the
-            strip then chains outwards and pans the whole page, leaving a band
-            of empty paper down the right. `clip` rather than `hidden`: hidden
-            would turn this into a scroll container on the other axis too. */}
-        <div className="relative overflow-x-clip">
-          <ul
-            ref={trackRef}
-            onScroll={onScroll}
-            tabIndex={0}
-            aria-label="Photo carousel — scroll or use the arrows"
-            className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth [scrollbar-width:none] motion-reduce:scroll-auto [&::-webkit-scrollbar]:hidden"
-          >
-            {slides.map((photo, position) => {
-              const isCopy = loop && (position === 0 || position === slides.length - 1)
-              const photoIndex = photoAt(position)
-              const openable = viewable.findIndex((p) => p.slide === photoIndex)
-              const frame = `${FRAME_ASPECT} overflow-hidden border border-rail`
+    // First section under the hero: the dark-to-light change is its divider.
+    <Section id="gallery" label="" title="Ours" title_zh="我们" divider={false}>
+      <div
+        onPointerEnter={onGalleryPointerEnter}
+        onPointerLeave={onGalleryPointerLeave}
+        onFocus={onGalleryFocus}
+        onBlur={onGalleryBlur}
+      >
+        <Reveal>
+          {/* Reaching out over the section's side padding, and clipped only
+              sideways: a polaroid thrown off the pile fades out past the edge
+              of the screen on a phone rather than at a line inside it, and
+              never adds width to the page. */}
+          <div ref={stackRef} className="-mx-6 overflow-x-clip px-6">
+            <div className="relative pt-2.5 pb-4">
+              {under.map(({ photo, transform }, i) => (
+                <Polaroid
+                  key={i}
+                  photo={photo}
+                  aria-hidden="true"
+                  className="absolute inset-x-0 top-2.5"
+                  style={{ transform }}
+                />
+              ))}
 
-              return (
-                <li
-                  key={position}
-                  aria-hidden={isCopy ? 'true' : undefined}
-                  className="w-full shrink-0 snap-start px-px"
-                >
-                  <figure>
-                    {/* A copy is scenery for the swipe — never a control, and
-                        never announced, or every photo would be read twice. */}
-                    {isCopy || openable === -1 ? (
-                      <div className={frame}>
-                        <Photo photo={photo} loading={position <= 1 ? 'eager' : 'lazy'} />
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        ref={(el) => {
-                          triggersRef.current[photoIndex] = el
-                        }}
-                        onClick={() => setOpenAt(openable)}
-                        className={`${frame} w-full transition-opacity hover:opacity-85`}
-                      >
-                        <Photo photo={photo} loading={position <= 1 ? 'eager' : 'lazy'} />
-                        <span className="sr-only">
-                          Open photo {openable + 1} of {viewable.length} full screen
-                        </span>
-                      </button>
-                    )}
-
-                    {(photo.caption || photo.caption_zh) && (
-                      <figcaption className="mt-3 px-1 text-center">
-                        {/* whitespace-pre-line honours a \n written into a
-                            caption in config.js — that is what puts the year
-                            on its own line — while still collapsing ordinary
-                            runs of spaces and wrapping long lines normally.
-
-                            Sizes read upwards: the bare one is the phone's and
-                            sm: takes over from 640px. The breakpoint is a
-                            prefix, never a suffix — `text-sm-[3rem]` is not a
-                            class Tailwind knows, and silently compiles to
-                            nothing at all. */}
-                        {photo.caption && (
-                          <p className="font-caption text-[2rem] leading-snug whitespace-pre-line text-ink sm:text-[3rem]">
-                            {photo.caption}
-                          </p>
-                        )}
-                        {photo.caption_zh && (
-                          <p className="zh mt-0.5 text-[0.9rem] leading-snug text-ink">
-                            {photo.caption_zh}
-                          </p>
-                        )}
-                      </figcaption>
-                    )}
-                  </figure>
-                </li>
-              )
-            })}
-          </ul>
-
-          {/* The arrows ride the edges of the photo itself. The overlay copies
-              the frame's aspect and hangs from the top of the strip, so the
-              buttons stay centred on the picture however tall a caption runs
-              underneath. It lets pointer events through, or it would swallow
-              the swipe. */}
-          {count > 1 && (
-            <div
-              className={`pointer-events-none absolute inset-x-0 top-0 flex ${FRAME_ASPECT} items-center justify-between px-2 sm:px-3`}
-            >
-              <button
-                type="button"
-                onClick={() => step(-1)}
-                aria-label="Previous photo"
-                className={ARROW}
-              >
-                <Chevron back />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => step(1)}
-                aria-label="Next photo"
-                className={ARROW}
-              >
-                <Chevron />
-              </button>
-            </div>
-          )}
-        </div>
-      </Reveal>
-
-      {count > 1 && (
-        <Reveal delay={60}>
-          <div className="mt-4 flex items-center justify-center gap-1.5">
-            {photos.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => goTo(i)}
-                aria-label={`Photo ${i + 1}`}
-                aria-current={i === index ? 'true' : undefined}
-                className={`h-1.5 rounded-full transition-all ${
-                  i === index ? 'w-4 bg-seal' : 'w-1.5 bg-rail/40 hover:bg-rail'
-                }`}
+              <Polaroid
+                photo={top}
+                onPointerDown={onCardPointerDown}
+                onPointerMove={onCardPointerMove}
+                onPointerUp={onCardPointerUp}
+                onPointerCancel={onCardPointerCancel}
+                className={`relative touch-pan-y ${count > 1 ? 'cursor-grab active:cursor-grabbing' : ''}`}
+                style={{ transform: topTransform, transition: topTransition, opacity: topOpacity }}
               />
-            ))}
+            </div>
           </div>
         </Reveal>
-      )}
 
-      {current && (
-        <div
-          ref={dialogRef}
-          role="dialog"
-          aria-modal="true"
-          aria-label={current.alt || current.caption || `Photo ${openAt + 1} of ${viewable.length}`}
-          tabIndex={-1}
-          onClick={onBackdropClick}
-          onPointerDown={onPointerDown}
-          onPointerUp={onPointerUp}
-          onPointerCancel={() => {
-            swipeRef.current = null
-          }}
-          /* touch-action decides who owns a horizontal drag. Left at the
-             default the browser treats it as a possible pan, claims the
-             gesture and fires pointercancel instead of pointerup — so the
-             swipe below never completes. Claiming the horizontal axis here
-             hands it back, while pan-y and pinch-zoom keep a two-finger zoom
-             into a photo working. */
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-ink/95 p-4 select-none [touch-action:pan-y_pinch-zoom]"
-        >
-          <img
-            src={current.src}
-            alt={current.alt || ''}
-            onClick={(event) => event.stopPropagation()}
-            className="max-h-[78svh] max-w-full object-contain"
-          />
-
-          {(current.caption || current.caption_zh) && (
-            <div
-              className="mt-4 max-w-[36rem] text-center"
-              onClick={(event) => event.stopPropagation()}
-            >
-              {/* Same face full screen, sized to sit with the photo. The
-                  Chinese below keeps its serif — the caption face, like any
-                  Latin display face, carries no CJK glyphs. */}
-              {current.caption && (
-                <p className="font-caption text-[1.6rem] leading-snug whitespace-pre-line text-paper/90">
-                  {current.caption}
-                </p>
-              )}
-              {current.caption_zh && (
-                <p className="zh mt-0.5 text-[0.9rem] text-paper/70">{current.caption_zh}</p>
-              )}
-            </div>
-          )}
-
-          {/* The same two arrows as the carousel, in the viewer's own colours.
-              They stop the click from reaching the backdrop, which would
-              otherwise close the viewer on the way past. */}
-          {viewable.length > 1 && (
-            <>
+        {count > 1 && (
+          <Reveal delay={60}>
+            <div className="mt-2 flex items-center justify-center gap-5">
               <button
                 type="button"
-                onClick={(event) => {
-                  event.stopPropagation()
-                  stepViewer(-1)
+                onClick={() => {
+                  hold()
+                  back()
                 }}
                 aria-label="Previous photo"
-                className={`${VIEWER_ARROW} left-3 sm:left-5`}
+                className={ARROW}
               >
                 <Chevron back />
               </button>
-
+              {/* Read out when the guest moves the pile, but not while it runs
+                  by itself - announcing a new photo every few seconds would
+                  drown out everything else. */}
+              <p
+                aria-live={autoplay ? 'off' : 'polite'}
+                className="ticket-data min-w-16 text-center text-[0.75rem] text-kopi tabular-nums"
+              >
+                {pile.index + 1} / {count}
+              </p>
               <button
                 type="button"
-                onClick={(event) => {
-                  event.stopPropagation()
-                  stepViewer(1)
+                onClick={() => {
+                  hold()
+                  next()
                 }}
                 aria-label="Next photo"
-                className={`${VIEWER_ARROW} right-3 sm:right-5`}
+                className={ARROW}
               >
                 <Chevron />
               </button>
-            </>
-          )}
+            </div>
 
-          <button
-            type="button"
-            onClick={close}
-            className="ticket-data absolute top-4 right-4 border border-paper/40 px-3 py-2 text-[0.6rem] text-paper transition-colors hover:border-ochre hover:text-ochre"
-          >
-            Close
-          </button>
+            {/* The years as stations on a little railway, and a train that
+                rides it along with the photos. The track behind the train is
+                seal, ahead of it rail grey. */}
+            {years.length > 1 && (
+              <div className="relative mx-auto mt-6 h-[74px] max-w-md">
+                <span aria-hidden="true" className="train-track absolute top-[30px] right-[22px] left-[22px]" />
+                <span
+                  aria-hidden="true"
+                  className={`train-track train-track-lit absolute top-[30px] right-[22px] left-[22px] transition-[clip-path] ${TRIP_EASE}`}
+                  style={{ clipPath: `inset(0 ${(1 - spot) * 100}% 0 0)`, transitionDuration: `${train.trip}ms` }}
+                />
 
-          {viewable.length > 1 && (
-            <p className="ticket-data absolute bottom-5 left-1/2 -translate-x-1/2 text-[0.6rem] text-paper/60">
-              {openAt + 1} / {viewable.length}
-            </p>
-          )}
-        </div>
-      )}
+                <ol>
+                  {years.map((year, k) => {
+                    const station = stations[k]
+                    const on = k === atYear
+                    return (
+                      <li key={year} className="absolute top-0 h-[70px] w-11 -translate-x-1/2" style={{ left: along(station) }}>
+                        <button
+                          type="button"
+                          onClick={() => jumpTo(year)}
+                          aria-label={`Photos from ${year}`}
+                          aria-current={on ? 'true' : undefined}
+                          className="relative block size-full"
+                        >
+                          <span
+                            className={`absolute top-[29px] left-1/2 size-2.5 -translate-x-1/2 rounded-full border-2 transition-colors ${
+                              station <= spot + 0.001 ? 'border-seal bg-seal' : 'border-rail bg-paper'
+                            }`}
+                          />
+                          <span
+                            className={`ticket-data absolute inset-x-0 top-[46px] text-center text-[0.625rem] tracking-[0.06em] transition-colors ${
+                              on ? 'font-bold text-seal' : 'text-rail'
+                            }`}
+                          >
+                            {year}
+                          </span>
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ol>
+
+                {/* Above the stations, and deaf to taps, so a tap meant for the
+                    station under it still reaches the station. */}
+                <div
+                  aria-hidden="true"
+                  className={`pointer-events-none absolute top-[9px] h-[22px] w-8 -translate-x-1/2 transition-[left] ${TRIP_EASE} ${
+                    train.moving ? 'train-moving' : ''
+                  }`}
+                  style={{ left: along(spot), transitionDuration: `${train.trip}ms` }}
+                >
+                  <Engine face={train.face} />
+                  {/* Steam from the chimney each time it stops. A new key for
+                      each stop starts a fresh puff rather than reusing the last. */}
+                  {train.puff > 0 && (
+                    <span key={train.puff} className="train-puff" style={{ left: train.face === 1 ? 22.5 : 9.5 }}>
+                      <span />
+                      <span />
+                      <span />
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+          </Reveal>
+        )}
+      </div>
     </Section>
   )
 }

@@ -1,5 +1,4 @@
 import Hero from './components/Hero'
-import Countdown from './components/Countdown'
 import Story from './components/Story'
 import Gallery from './components/Gallery'
 import Details from './components/Details'
@@ -33,7 +32,6 @@ export default function App() {
         />
         <MarginDoodles />
 
-        <Countdown />
         <Gallery />
         <Details />
         <Agenda />
